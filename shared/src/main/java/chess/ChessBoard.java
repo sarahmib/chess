@@ -144,10 +144,24 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
+
+        for (int i=0; i < 8; i++) {
+            for (int j=0; j < 8; j++) {
+                if (this.board[i][j] == null && that.board[i][j] == null) {
+                    continue;
+                }
+                if (this.board[i][j] instanceof ChessPiece && that.board[i][j] instanceof ChessPiece) {
+                    if (((ChessPiece) this.board[i][j]).getPieceType() == ((ChessPiece) that.board[i][j]).getPieceType() &&
+                    ((ChessPiece) this.board[i][j]).getTeamColor() == ((ChessPiece) that.board[i][j]).getTeamColor()) {
+                        continue;
+                    }
+                    return false;
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
