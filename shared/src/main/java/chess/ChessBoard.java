@@ -47,8 +47,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        int row = position.getRow();
-        int column = position.getColumn();
+        int row = position.getRow() - 1;
+        int column = position.getColumn() - 1;
 
         if (board[row][column] != "") {
             return (ChessPiece) board[row][column];
@@ -152,8 +152,7 @@ public class ChessBoard {
                     continue;
                 }
                 if (this.board[i][j] instanceof ChessPiece && that.board[i][j] instanceof ChessPiece) {
-                    if (((ChessPiece) this.board[i][j]).getPieceType() == ((ChessPiece) that.board[i][j]).getPieceType() &&
-                    ((ChessPiece) this.board[i][j]).getTeamColor() == ((ChessPiece) that.board[i][j]).getTeamColor()) {
+                    if (this.board[i][j].equals(that.board[i][j])) {
                         continue;
                     }
                     return false;
