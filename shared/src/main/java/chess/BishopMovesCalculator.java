@@ -12,15 +12,12 @@ import static chess.PieceMovesCalculator.downRightDiagonal;
 public class BishopMovesCalculator {
     ChessBoard board;
     public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        int row = position.getRow() - 1;
-        int column = position.getColumn() - 1;
-        Collection<ChessMove> validMoves;
-        validMoves = new ArrayList<>();
+        Collection<ChessMove> validMoves = new ArrayList<>();
 
-        upLeftDiagonal(board, row, column, validMoves);
-        downLeftDiagonal(board, row, column, validMoves);
-        upRightDiagonal(board, row, column, validMoves);
-        downRightDiagonal(board, row, column, validMoves);
+        upLeftDiagonal(board, position, validMoves);
+        downLeftDiagonal(board, position, validMoves);
+        upRightDiagonal(board, position, validMoves);
+        downRightDiagonal(board, position, validMoves);
 
         return validMoves;
     }
