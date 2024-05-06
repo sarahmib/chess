@@ -241,4 +241,24 @@ public class PieceMovesCalculator {
             col++;
         }
     }
+
+    // below are a couple of generally useful methods
+
+    public static boolean isValidMove(ChessBoard board, int startRow, int startCol, int endRow, int endCol) {
+        if (0 > endRow || endRow > 7 || 0 > endCol || endCol > 7) {
+            return false;
+        } else if (board.board[endRow][endCol] instanceof ChessPiece) {
+            if (((ChessPiece) board.board[startRow][startCol]).getTeamColor() == ((ChessPiece) board.board[endRow][endCol]).getTeamColor()) {
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    public static void addMove(Collection<ChessMove> validMoves, ChessPosition startPosition, int endRow, int endCol) {
+        ChessPosition endPosition = new ChessPosition(endRow + 1, endCol + 1);
+        ChessMove newMove = new ChessMove(startPosition, endPosition, null);
+        validMoves.add(newMove);
+    }
 }
