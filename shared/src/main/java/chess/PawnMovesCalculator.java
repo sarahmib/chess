@@ -1,92 +1,91 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
-
-import static chess.PieceMovesCalculator.addMovePawn;
 
 public class PawnMovesCalculator {
 
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
+    public static void pieceMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> validMoves) {
+        ChessPiece piece = board.getPiece(position);
         int row = position.getRow();
         int col = position.getColumn();
 
-        if (board.getPiece(position).getTeamColor() == ChessGame.TeamColor.WHITE) {
-            if (checkValidMove(board, position, new ChessPosition(row + 1, col - 1), ChessGame.TeamColor.WHITE, true)) {
-                if (row + 1 == 8) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row + 1, col - 1));
-                } else {
-                    addMovePawn(validMoves, position, row + 1, col - 1);
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if (row == 2 && board.getPiece(new ChessPosition(row + 1, col)) == null) {
+                if (isValidMovePawn(board, position, new ChessPosition(row + 2, col), false)) {
+                    MovesCalculator.addMove(position, new ChessPosition(row + 2, col), validMoves);
                 }
             }
-            if (checkValidMove(board, position, new ChessPosition(row + 1, col), ChessGame.TeamColor.WHITE, false)) {
+
+            if (isValidMovePawn(board, position, new ChessPosition(row + 1, col - 1), true)) {
                 if (row + 1 == 8) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row + 1, col));
+                    addAllPromotion(position, new ChessPosition(row + 1, col - 1), validMoves);
                 } else {
-                    addMovePawn(validMoves, position, row + 1, col);
-                }
-                if (row == 2 && checkValidMove(board, position, new ChessPosition(row + 2, col), ChessGame.TeamColor.WHITE, false)) {
-                    addMovePawn(validMoves, position, row + 2, col);
+                    MovesCalculator.addMove(position, new ChessPosition(row + 1, col - 1), validMoves);
                 }
             }
-            if (checkValidMove(board, position, new ChessPosition(row + 1, col + 1), ChessGame.TeamColor.WHITE, true)) {
+
+            if (isValidMovePawn(board, position, new ChessPosition(row + 1, col), false)) {
                 if (row + 1 == 8) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row + 1, col + 1));
+                    addAllPromotion(position, new ChessPosition(row + 1, col), validMoves);
                 } else {
-                    addMovePawn(validMoves, position, row + 1, col + 1);
+                    MovesCalculator.addMove(position, new ChessPosition(row + 1, col), validMoves);
+                }
+            }
+
+            if (isValidMovePawn(board, position, new ChessPosition(row + 1, col + 1), true)) {
+                if (row + 1 == 8) {
+                    addAllPromotion(position, new ChessPosition(row + 1, col + 1), validMoves);
+                } else {
+                    MovesCalculator.addMove(position, new ChessPosition(row + 1, col + 1), validMoves);
                 }
             }
         } else {
-            if (checkValidMove(board, position, new ChessPosition(row -1, col - 1), ChessGame.TeamColor.BLACK, true)) {
-                if (row - 1 == 1) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row - 1, col - 1));
-                } else {
-                    addMovePawn(validMoves, position, row - 1, col - 1);
+            if (row == 7 && board.getPiece(new ChessPosition(row - 1, col)) == null) {
+                if (isValidMovePawn(board, position, new ChessPosition(row - 2, col), false)) {
+                    MovesCalculator.addMove(position, new ChessPosition(row - 2, col), validMoves);
                 }
             }
-            if (checkValidMove(board, position, new ChessPosition(row - 1, col), ChessGame.TeamColor.BLACK, false)) {
+
+            if (isValidMovePawn(board, position, new ChessPosition(row - 1, col - 1), true)) {
                 if (row - 1 == 1) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row - 1, col));
+                    addAllPromotion(position, new ChessPosition(row - 1, col - 1), validMoves);
                 } else {
-                    addMovePawn(validMoves, position, row - 1, col);
-                }
-                if (row == 7 && checkValidMove(board, position, new ChessPosition(row - 2, col), ChessGame.TeamColor.BLACK, false)) {
-                    addMovePawn(validMoves, position, row - 2, col);
+                    MovesCalculator.addMove(position, new ChessPosition(row - 1, col - 1), validMoves);
                 }
             }
-            if (checkValidMove(board, position, new ChessPosition(row - 1, col + 1), ChessGame.TeamColor.BLACK, true)) {
+
+            if (isValidMovePawn(board, position, new ChessPosition(row - 1, col), false)) {
                 if (row - 1 == 1) {
-                    addAllPromotion(validMoves, position, new ChessPosition(row - 1, col + 1));
+                    addAllPromotion(position, new ChessPosition(row - 1, col), validMoves);
                 } else {
-                    addMovePawn(validMoves, position, row - 1, col + 1);
+                    MovesCalculator.addMove(position, new ChessPosition(row - 1, col), validMoves);
+                }
+            }
+
+            if (isValidMovePawn(board, position, new ChessPosition(row - 1, col + 1), true)) {
+                if (row - 1 == 1) {
+                    addAllPromotion(position, new ChessPosition(row - 1, col + 1), validMoves);
+                } else {
+                    MovesCalculator.addMove(position, new ChessPosition(row - 1, col + 1), validMoves);
                 }
             }
         }
-
-        return validMoves;
     }
 
-    private static boolean checkValidMove(ChessBoard board, ChessPosition startPosition, ChessPosition endPosition, ChessGame.TeamColor pieceColor, boolean diagonalMove) {
-        if (endPosition.getColumn() < 1 || endPosition.getColumn() > 8 || endPosition.getRow() < 1 || endPosition.getRow() > 8) {
+    private static boolean isValidMovePawn(ChessBoard board, ChessPosition startPosition, ChessPosition endPosition, boolean isDiagonalMove) {
+        if (endPosition.getColumn() > 8 || endPosition.getColumn() < 1 || endPosition.getRow() > 8 || endPosition.getRow() < 1) {
             return false;
         }
-        if (!diagonalMove && board.getPiece(endPosition) != null) {
-            return false;
+        if (isDiagonalMove) {
+            return board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() != board.getPiece(startPosition).getTeamColor();
         }
-        if (diagonalMove) {
-            if (board.getPiece(endPosition) == null || board.getPiece(endPosition).getTeamColor() == pieceColor) {
-                return false;
-            }
-            return true;
-        }
-        return true;
+        return board.getPiece(endPosition) == null;
     }
 
-    private static void addAllPromotion(Collection<ChessMove> validMoves, ChessPosition startPosition, ChessPosition endPosition) {
-        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.QUEEN));
+    private static void addAllPromotion(ChessPosition startPosition, ChessPosition endPosition, Collection<ChessMove> validMoves) {
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
         validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.BISHOP));
         validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.KNIGHT));
-        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.QUEEN));
     }
 }

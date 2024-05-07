@@ -1,42 +1,36 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
-
-import static chess.PieceMovesCalculator.*;
 
 public class KnightMovesCalculator {
 
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        int startRow = position.getRow() - 1;
-        int startCol = position.getColumn() - 1;
+    public static void pieceMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> validMoves) {
+        int row = position.getRow();
+        int col = position.getColumn();
 
-        if (isValidMove(board, startRow, startCol, startRow - 2, startCol + 1)) {
-            addMove(validMoves, position, startRow - 2, startCol + 1);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row - 2, col - 1))) {
+            MovesCalculator.addMove(position, new ChessPosition(row - 2, col - 1), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow - 2, startCol - 1)) {
-            addMove(validMoves, position, startRow - 2, startCol - 1);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row - 2, col + 1))) {
+            MovesCalculator.addMove(position, new ChessPosition(row - 2, col + 1), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow - 1, startCol - 2)) {
-            addMove(validMoves, position, startRow - 1, startCol - 2);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row - 1, col - 2))) {
+            MovesCalculator.addMove(position, new ChessPosition(row - 1, col - 2), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow - 1, startCol + 2)) {
-            addMove(validMoves, position, startRow - 1, startCol + 2);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row - 1, col + 2))) {
+            MovesCalculator.addMove(position, new ChessPosition(row - 1, col + 2), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow + 1, startCol - 2)) {
-            addMove(validMoves, position, startRow + 1, startCol - 2);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row + 1, col - 2))) {
+            MovesCalculator.addMove(position, new ChessPosition(row + 1, col - 2), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow + 1, startCol + 2)) {
-            addMove(validMoves, position, startRow + 1, startCol + 2);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row + 1, col + 2))) {
+            MovesCalculator.addMove(position, new ChessPosition(row + 1, col + 2), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow + 2, startCol - 1)) {
-            addMove(validMoves, position, startRow + 2, startCol - 1);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row + 2, col - 1))) {
+            MovesCalculator.addMove(position, new ChessPosition(row + 2, col - 1), validMoves);
         }
-        if (isValidMove(board, startRow, startCol, startRow + 2, startCol + 1)) {
-            addMove(validMoves, position, startRow + 2, startCol + 1);
+        if (MovesCalculator.isValidMove(board, position, new ChessPosition(row + 2, col + 1))) {
+            MovesCalculator.addMove(position, new ChessPosition(row + 2, col + 1), validMoves);
         }
-
-        return validMoves;
     }
 }

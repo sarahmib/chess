@@ -1,24 +1,17 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
-
-import static chess.PieceMovesCalculator.*;
 
 public class QueenMovesCalculator {
 
-    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-
-        straightUp(board, position, validMoves);
-        upRightDiagonal(board, position, validMoves);
-        straightLeft(board, position, validMoves);
-        downRightDiagonal(board, position, validMoves);
-        straightDown(board, position, validMoves);
-        downLeftDiagonal(board, position, validMoves);
-        straightRight(board, position, validMoves);
-        upLeftDiagonal(board, position, validMoves);
-
-        return validMoves;
+    public static void pieceMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> validMoves) {
+        MovesCalculator.moveUp(board, position, validMoves);
+        MovesCalculator.moveUpRight(board, position, validMoves);
+        MovesCalculator.moveRight(board, position, validMoves);
+        MovesCalculator.moveDownRight(board, position, validMoves);
+        MovesCalculator.moveDown(board, position, validMoves);
+        MovesCalculator.moveDownLeft(board, position, validMoves);
+        MovesCalculator.moveLeft(board, position, validMoves);
+        MovesCalculator.moveUpLeft(board, position, validMoves);
     }
 }
