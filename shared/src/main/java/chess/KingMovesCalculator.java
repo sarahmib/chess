@@ -3,8 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static chess.PieceMovesCalculator.addMove;
-import static chess.PieceMovesCalculator.isValidMove;
+import static chess.PieceMovesCalculator.*;
 
 public class KingMovesCalculator {
 

@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class PieceMovesCalculator {
@@ -259,6 +258,11 @@ public class PieceMovesCalculator {
     public static void addMove(Collection<ChessMove> validMoves, ChessPosition startPosition, int endRow, int endCol) {
         ChessPosition endPosition = new ChessPosition(endRow + 1, endCol + 1);
         ChessMove newMove = new ChessMove(startPosition, endPosition, null);
+        validMoves.add(newMove);
+    }
+
+    public static void addMovePawn(Collection<ChessMove> validMoves, ChessPosition startPosition, int endRow, int endCol) {
+        ChessMove newMove = new ChessMove(startPosition, new ChessPosition(endRow, endCol), null);
         validMoves.add(newMove);
     }
 }
