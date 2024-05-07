@@ -23,14 +23,13 @@ public class MovesCalculator {
 
     public static void moveUp(ChessBoard board, ChessPosition startPosition, Collection<ChessMove> validMoves) {
         int row = startPosition.getRow();
-        int col = startPosition.getColumn();
 
         row--;
 
-        while(isValidMove(board, startPosition, new ChessPosition(row, col))) {
-            addMove(startPosition, new ChessPosition(row, col), validMoves);
+        while(isValidMove(board, startPosition, new ChessPosition(row, startPosition.getColumn()))) {
+            addMove(startPosition, new ChessPosition(row, startPosition.getColumn()), validMoves);
 
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
+            if (board.getPiece(new ChessPosition(row, startPosition.getColumn())) != null) {
                 break;
             }
             row--;
@@ -38,15 +37,14 @@ public class MovesCalculator {
     }
 
     public static void moveRight(ChessBoard board, ChessPosition startPosition, Collection<ChessMove> validMoves) {
-        int row = startPosition.getRow();
         int col = startPosition.getColumn();
 
         col++;
 
-        while(isValidMove(board, startPosition, new ChessPosition(row, col))) {
-            addMove(startPosition, new ChessPosition(row, col), validMoves);
+        while(isValidMove(board, startPosition, new ChessPosition(startPosition.getRow(), col))) {
+            addMove(startPosition, new ChessPosition(startPosition.getRow(), col), validMoves);
 
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
+            if (board.getPiece(new ChessPosition(startPosition.getRow(), col)) != null) {
                 break;
             }
             col++;
@@ -55,14 +53,13 @@ public class MovesCalculator {
 
     public static void moveDown(ChessBoard board, ChessPosition startPosition, Collection<ChessMove> validMoves) {
         int row = startPosition.getRow();
-        int col = startPosition.getColumn();
 
         row++;
 
-        while(isValidMove(board, startPosition, new ChessPosition(row, col))) {
-            addMove(startPosition, new ChessPosition(row, col), validMoves);
+        while(isValidMove(board, startPosition, new ChessPosition(row, startPosition.getColumn()))) {
+            addMove(startPosition, new ChessPosition(row, startPosition.getColumn()), validMoves);
 
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
+            if (board.getPiece(new ChessPosition(row, startPosition.getColumn())) != null) {
                 break;
             }
             row++;
@@ -70,15 +67,14 @@ public class MovesCalculator {
     }
 
     public static void moveLeft(ChessBoard board, ChessPosition startPosition, Collection<ChessMove> validMoves) {
-        int row = startPosition.getRow();
         int col = startPosition.getColumn();
 
         col--;
 
-        while(isValidMove(board, startPosition, new ChessPosition(row, col))) {
-            addMove(startPosition, new ChessPosition(row, col), validMoves);
+        while(isValidMove(board, startPosition, new ChessPosition(startPosition.getRow(), col))) {
+            addMove(startPosition, new ChessPosition(startPosition.getRow(), col), validMoves);
 
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
+            if (board.getPiece(new ChessPosition(startPosition.getRow(), col)) != null) {
                 break;
             }
             col--;
