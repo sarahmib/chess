@@ -62,6 +62,10 @@ public class ChessBoard {
         setBlack();
     }
 
+    public void clearSquare(ChessPosition position) {
+        board[position.getRow()][position.getColumn()] = null;
+    }
+
     private void setWhite() {
         addPiece(new ChessPosition(1, 1), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK));
         addPiece(new ChessPosition(1, 2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT));
