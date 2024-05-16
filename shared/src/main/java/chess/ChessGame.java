@@ -50,7 +50,6 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // null if no piece at startPosition
         return board.getPiece(startPosition).pieceMoves(board, startPosition);
     }
 
@@ -62,6 +61,14 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // finish implementing this by checking if the move is legal -- for ex, will it put king in check?
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn || !validMoves(move.getStartPosition()).contains(move)) {
+            throw new InvalidMoveException();
+        }
+        ChessBoard originalBoard = board;
+
+        // clone board, execute move, check if king is in check. If they are, change board back and throw exception
+        // change board back regardless of outcome
+
 
         ChessPiece piece = board.getPiece(move.getStartPosition());
 
