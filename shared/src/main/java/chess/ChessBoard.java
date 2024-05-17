@@ -63,7 +63,7 @@ public class ChessBoard implements Cloneable {
     }
 
     public void clearSquare(ChessPosition position) {
-        board[position.getRow()][position.getColumn()] = null;
+        board[position.getRow() - 1][position.getColumn() - 1] = null;
     }
 
     private void setWhite() {
@@ -100,6 +100,7 @@ public class ChessBoard implements Cloneable {
     public ChessBoard clone() {
         try {
             ChessBoard clonedBoard = (ChessBoard) super.clone();
+            clonedBoard.board = new Object[8][8];
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     if (board[i][j] instanceof ChessPiece) {

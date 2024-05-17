@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -50,7 +52,16 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        return board.getPiece(startPosition).pieceMoves(board, startPosition);
+        Collection<ChessMove> possibleMoves =  board.getPiece(startPosition).pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        for (ChessMove move : possibleMoves) {
+            if (testMove(move)) {
+                validMoves.add(move);
+            }
+        }
+
+        return validMoves;
     }
 
     /**
@@ -63,6 +74,15 @@ public class ChessGame {
         if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn || !validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException();
         }
+        if (!testMove(move)) {
+            throw new InvalidMoveException();
+        } else {
+            movePiece(move);
+        }
+
+    }
+
+    private boolean testMove(ChessMove move) {
         ChessBoard originalBoard = board;
         ChessBoard newBoard = board.clone();
         setBoard(newBoard);
@@ -71,10 +91,10 @@ public class ChessGame {
 
         if (isInCheck(board.getPiece(move.getEndPosition()).getTeamColor())) {
             setBoard(originalBoard);
-            throw new InvalidMoveException();
+            return false;
         } else {
             setBoard(originalBoard);
-            movePiece(move);
+            return true;
         }
     }
 
@@ -101,7 +121,7 @@ public class ChessGame {
             for (int j=1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
                 if (board.getPiece(currentPosition) != null && board.getPiece(currentPosition).getTeamColor() != teamColor) {
-                    Collection<ChessMove> possibleMoves = validMoves(currentPosition);
+                    Collection<ChessMove> possibleMoves = board.getPiece(currentPosition).pieceMoves(board, currentPosition);
 
                     for (ChessMove move : possibleMoves) {
                         if (move.getEndPosition().equals(kingPosition)) {
