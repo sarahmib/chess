@@ -21,7 +21,6 @@ public class ChessBoard implements Cloneable {
                 board[i][j] = null;
             }
         }
-        resetBoard();
     }
 
     /**
