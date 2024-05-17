@@ -97,20 +97,25 @@ public class ChessBoard implements Cloneable {
     }
 
     @Override
-    public ChessBoard clone() throws CloneNotSupportedException {
-        ChessBoard clonedBoard = (ChessBoard) super.clone();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] instanceof ChessPiece) {
-                    ChessPiece originalPiece = (ChessPiece) board[i][j];
-                    ChessPiece clonedPiece = new ChessPiece(originalPiece.getTeamColor(), originalPiece.getPieceType());
-                    clonedBoard.board[i][j] = clonedPiece;
-                } else {
-                    clonedBoard.board[i][j] = null;
+    public ChessBoard clone() {
+        try {
+            ChessBoard clonedBoard = (ChessBoard) super.clone();
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (board[i][j] instanceof ChessPiece) {
+                        ChessPiece originalPiece = (ChessPiece) board[i][j];
+                        ChessPiece clonedPiece = new ChessPiece(originalPiece.getTeamColor(), originalPiece.getPieceType());
+                        clonedBoard.board[i][j] = clonedPiece;
+                    } else {
+                        clonedBoard.board[i][j] = null;
+                    }
                 }
             }
+            return clonedBoard;
+        } catch (CloneNotSupportedException e) {
+            System.out.println(e);
+            return null;
         }
-        return clonedBoard;
     }
 
     @Override

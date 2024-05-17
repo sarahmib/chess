@@ -60,18 +60,26 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        // finish implementing this by checking if the move is legal -- for ex, will it put king in check?
         if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn || !validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException();
         }
         ChessBoard originalBoard = board;
+        ChessBoard newBoard = board.clone();
+        setBoard(newBoard);
 
-        // clone board, execute move, check if king is in check. If they are, change board back and throw exception
-        // change board back regardless of outcome
+        movePiece(move);
 
+        if (isInCheck(board.getPiece(move.getEndPosition()).getTeamColor())) {
+            setBoard(originalBoard);
+            throw new InvalidMoveException();
+        } else {
+            setBoard(originalBoard);
+            movePiece(move);
+        }
+    }
 
+    private void movePiece(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
-
         if (move.getPromotionPiece() != null) {
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
             board.clearSquare(move.getStartPosition());
