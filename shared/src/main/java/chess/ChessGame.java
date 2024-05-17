@@ -81,8 +81,16 @@ public class ChessGame {
             throw new InvalidMoveException();
         } else {
             movePiece(move);
+            switchTurn();
         }
+    }
 
+    private void switchTurn() {
+        if (teamTurn == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     private boolean testMove(ChessMove move) {
