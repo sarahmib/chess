@@ -30,7 +30,7 @@ public class Handler {
         gson = builder.create();
     }
 
-    public Response register(Request req, Response res) throws DataAccessException {
+    public Object register(Request req, Response res) throws DataAccessException {
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
         try {
             userService.register(request);
@@ -38,6 +38,7 @@ public class Handler {
             RegisterResponse registerResponse = new RegisterResponse(response.username(), response.authToken());
             res.status(200);
             res.body(toJson(registerResponse));
+            return toJson(registerResponse);
         } catch (AlreadyTakenException ex) {
             res.status(403);
             res.body(toJson(ex));
@@ -45,7 +46,7 @@ public class Handler {
             res.status(400);
             res.body(toJson(ex));
         }
-        return res;
+        return null;
     }
 
     public Object clearDb(Request req, Response res) throws DataAccessException {
@@ -53,8 +54,8 @@ public class Handler {
         gameService.clearGames();
         authService.clearAuths();
         res.status(200);
-        res.body(toJson(""));
-        return toJson("");
+        res.type("application/json");
+        return "{}";
     }
 
     private String toJson(Object response) {
