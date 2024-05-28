@@ -36,10 +36,14 @@ public class AuthService {
     }
 
     public LogoutResponse logout(LogoutRequest request) throws DataAccessException {
-        if (authDataAccess.getAuth(request.authToken()) == null) {
-            throw new UnauthorizedException("Error: unauthorized");
-        }
+        isAuthorized(request.authToken());
         authDataAccess.deleteAuth(request.authToken());
         return new LogoutResponse(null);
+    }
+
+    public void isAuthorized(String authToken) throws DataAccessException {
+        if (authDataAccess.getAuth(authToken) == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 }

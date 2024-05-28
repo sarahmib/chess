@@ -2,9 +2,11 @@ package server;
 
 import dataaccess.*;
 import model.AuthData;
+import request.ListGamesRequest;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
+import response.ListGamesResponse;
 import response.LoginResponse;
 import response.LogoutResponse;
 import response.RegisterResponse;
@@ -76,6 +78,20 @@ public class Handler {
             res.status(401);
             LogoutResponse logoutResponse = new LogoutResponse(ex.getMessage());
             return toJson(logoutResponse);
+        }
+    }
+
+    public Object listGames(Request req, Response res) throws DataAccessException {
+        ListGamesRequest request = new ListGamesRequest(req.headers("authorization"));
+        try {
+            authService.isAuthorized(request.authToken());
+            ListGamesResponse listGamesResponse = gameService.listGames();
+            res.status(200);
+            return toJson(listGamesResponse);
+        } catch (UnauthorizedException ex) {
+            res.status(401);
+            ListGamesResponse listGamesResponse = new ListGamesResponse(null, ex.getMessage());
+            return toJson(listGamesResponse);
         }
     }
 
