@@ -1,21 +1,14 @@
 package server;
 
-import service.AuthService;
-import service.GameService;
-import service.UserService;
+import dataaccess.DataAccessException;
 import spark.*;
 
 public class Server {
 
-    private final UserService userService;
-    private final GameService gameService;
-    private final AuthService authService;
+    private final Handler handler;
 
     public Server() {
-        userService = new UserService();
-        gameService = new GameService();
-        authService = new AuthService();
-
+        handler = new Handler();
     }
 
     public int run(int desiredPort) {
@@ -24,14 +17,23 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.delete("/db", this::clearDb);
+            Spark.post("/user", handler::register);
+            Spark.delete("/db", handler::clearDb);
+            Spark.exception(DataAccessException.class, this::exceptionHandler);
+
 
         Spark.awaitInitialization();
         return Spark.port();
+    }
+
+    private void exceptionHandler(DataAccessException ex, Request req, Response res) {
+        res.status(500);
+        res.body("{ \"message\" : \"Error : " + ex.getMessage() + "\" }");
     }
 
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
     }
+
 }

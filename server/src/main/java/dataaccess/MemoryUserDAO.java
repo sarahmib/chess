@@ -3,6 +3,7 @@ package dataaccess;
 import model.UserData;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO{
 
@@ -12,5 +13,23 @@ public class MemoryUserDAO implements UserDAO{
     @Override
     public void clearUsers() {
         users.clear();
+    }
+
+    @Override
+    public UserData getUser(String username) throws DataAccessException {
+        for (Map.Entry<Integer, UserData> entry : users.entrySet()) {
+            UserData userData = entry.getValue();
+            if (userData.username().equals(username)) {
+                return userData;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void createUser(String username, String password, String email) throws DataAccessException {
+        UserData userData = new UserData(username, password, email);
+        users.put(nextId, userData);
+        nextId++;
     }
 }
