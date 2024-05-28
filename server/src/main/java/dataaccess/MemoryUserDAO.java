@@ -4,6 +4,7 @@ import model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MemoryUserDAO implements UserDAO{
 
@@ -31,5 +32,16 @@ public class MemoryUserDAO implements UserDAO{
         UserData userData = new UserData(username, password, email);
         users.put(nextId, userData);
         nextId++;
+    }
+
+    @Override
+    public boolean findUser(String username, String password) throws DataAccessException {
+        for (Map.Entry<Integer, UserData> entry : users.entrySet()) {
+            UserData userData = entry.getValue();
+            if (Objects.equals(userData.username(), username) && Objects.equals(userData.password(), password)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

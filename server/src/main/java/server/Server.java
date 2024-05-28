@@ -18,6 +18,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
             Spark.post("/user", handler::register);
+            Spark.post("/session", handler::login);
             Spark.delete("/db", handler::clearDb);
             Spark.exception(DataAccessException.class, this::exceptionHandler);
 
@@ -26,9 +27,10 @@ public class Server {
         return Spark.port();
     }
 
-    private void exceptionHandler(DataAccessException ex, Request req, Response res) {
+    private Object exceptionHandler(DataAccessException ex, Request req, Response res) {
         res.status(500);
-        res.body("{ \"message\" : \"Error : " + ex.getMessage() + "\" }");
+        res.type("application/json");
+        return "{ \"message\" : \"Error : " + ex.getMessage() + "\" }";
     }
 
     public void stop() {

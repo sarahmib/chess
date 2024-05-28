@@ -1,11 +1,9 @@
 package service;
 
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import request.LoginRequest;
 import request.RegisterRequest;
 import response.RegisterResponse;
 
@@ -33,5 +31,11 @@ public class UserService {
         }
 
         userDataAccess.createUser(request.username(), request.password(), request.email());
+    }
+
+    public void login(LoginRequest request) throws DataAccessException {
+        if (!userDataAccess.findUser(request.username(), request.password())) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
     }
 }

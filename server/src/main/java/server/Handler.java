@@ -2,7 +2,9 @@ package server;
 
 import dataaccess.*;
 import model.AuthData;
+import request.LoginRequest;
 import request.RegisterRequest;
+import response.LoginResponse;
 import response.RegisterResponse;
 import service.AuthService;
 import service.GameService;
@@ -34,8 +36,7 @@ public class Handler {
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
         try {
             userService.register(request);
-            AuthData response = authService.createAuth(request.username());
-            RegisterResponse registerResponse = new RegisterResponse(response.username(), response.authToken(), null);
+            RegisterResponse registerResponse = authService.register(request.username());
             res.status(200);
             return toJson(registerResponse);
         } catch (AlreadyTakenException ex) {
@@ -46,6 +47,20 @@ public class Handler {
             res.status(400);
             RegisterResponse registerResponse = new RegisterResponse(null, null, ex.getMessage());
             return toJson(registerResponse);
+        }
+    }
+
+    public Object login(Request req, Response res) throws DataAccessException {
+        LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
+        try {
+            userService.login(request);
+            LoginResponse loginResponse = authService.login(request.username());
+            res.status(200);
+            return toJson(loginResponse);
+        } catch (UnauthorizedException ex) {
+            res.status(401);
+            LoginResponse loginResponse = new LoginResponse(null, null, ex.getMessage());
+            return toJson(loginResponse);
         }
     }
 
