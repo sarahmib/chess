@@ -35,18 +35,18 @@ public class Handler {
         try {
             userService.register(request);
             AuthData response = authService.createAuth(request.username());
-            RegisterResponse registerResponse = new RegisterResponse(response.username(), response.authToken());
+            RegisterResponse registerResponse = new RegisterResponse(response.username(), response.authToken(), null);
             res.status(200);
-            res.body(toJson(registerResponse));
             return toJson(registerResponse);
         } catch (AlreadyTakenException ex) {
             res.status(403);
-            res.body(toJson(ex));
+            RegisterResponse registerResponse = new RegisterResponse(null, null, ex.getMessage());
+            return toJson(registerResponse);
         } catch (BadRequestException ex) {
             res.status(400);
-            res.body(toJson(ex));
+            RegisterResponse registerResponse = new RegisterResponse(null, null, ex.getMessage());
+            return toJson(registerResponse);
         }
-        return null;
     }
 
     public Object clearDb(Request req, Response res) throws DataAccessException {
@@ -61,6 +61,7 @@ public class Handler {
     private String toJson(Object response) {
         String resultAsJson;
         resultAsJson = gson.toJson(response);
+        System.out.println(resultAsJson);
         return resultAsJson;
     }
 }

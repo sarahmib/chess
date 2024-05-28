@@ -22,13 +22,14 @@ public class UserService {
     }
 
     public void register(RegisterRequest request) throws DataAccessException {
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+
         UserData user = userDataAccess.getUser(request.username());
 
         if (user != null) {
             throw new AlreadyTakenException("Error: already taken");
-        }
-        if (request.username() == null || request.password() == null || request.email() == null) {
-            throw new BadRequestException("Error: bad request");
         }
 
         userDataAccess.createUser(request.username(), request.password(), request.email());
