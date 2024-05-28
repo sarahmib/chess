@@ -2,8 +2,11 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
+import request.LogoutRequest;
 import response.LoginResponse;
+import response.LogoutResponse;
 import response.RegisterResponse;
 
 public class AuthService {
@@ -30,5 +33,13 @@ public class AuthService {
     public LoginResponse login(String username) throws DataAccessException {
         AuthData response = createAuth(username);
         return new LoginResponse(response.username(), response.authToken(), null);
+    }
+
+    public LogoutResponse logout(LogoutRequest request) throws DataAccessException {
+        if (authDataAccess.getAuth(request.authToken()) == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        authDataAccess.deleteAuth(request.authToken());
+        return new LogoutResponse(null);
     }
 }
