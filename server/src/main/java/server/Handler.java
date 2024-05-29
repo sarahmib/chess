@@ -76,9 +76,8 @@ public class Handler {
     }
 
     public Object listGames(Request req, Response res) throws DataAccessException {
-        ListGamesRequest request = new ListGamesRequest(req.headers("authorization"));
         try {
-            authService.isAuthorized(request.authToken());
+            authService.isAuthorized(req.headers("authorization"));
             ListGamesResponse listGamesResponse = gameService.listGames();
             res.status(200);
             return toJson(listGamesResponse);

@@ -40,19 +40,19 @@ public class GameService {
     }
 
     public JoinGameResponse joinGame(JoinGameRequest request) throws DataAccessException {
-        if (request.gameID() == null || request.teamColor() == null) {
+        if (request.gameID() == null || request.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
         }
         GameData game = gameDataAccess.getGame(request.gameID());
 
-        if (game.blackUsername() != null && request.teamColor() == ChessGame.TeamColor.BLACK) {
+        if (game.blackUsername() != null && request.playerColor() == ChessGame.TeamColor.BLACK) {
             throw new AlreadyTakenException("Error: already taken");
         }
-        if (game.whiteUsername() != null && request.teamColor() == ChessGame.TeamColor.WHITE) {
+        if (game.whiteUsername() != null && request.playerColor() == ChessGame.TeamColor.WHITE) {
             throw new AlreadyTakenException("Error: already taken");
         }
 
-        if (request.teamColor() == ChessGame.TeamColor.WHITE) {
+        if (request.playerColor() == ChessGame.TeamColor.WHITE) {
             GameData newGame = new GameData(game.gameID(), request.username(), game.blackUsername(), game.gameName(), game.game());
             gameDataAccess.updateGame(newGame);
         } else {

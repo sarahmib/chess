@@ -23,6 +23,7 @@ public class MemoryAuthDAO implements AuthDAO {
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
         auths.put(nextId, authData);
+        nextId++;
 
         return authData;
     }
