@@ -2,14 +2,8 @@ package server;
 
 import dataaccess.*;
 import model.AuthData;
-import request.ListGamesRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
-import response.ListGamesResponse;
-import response.LoginResponse;
-import response.LogoutResponse;
-import response.RegisterResponse;
+import request.*;
+import response.*;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
@@ -92,6 +86,25 @@ public class Handler {
             res.status(401);
             ListGamesResponse listGamesResponse = new ListGamesResponse(null, ex.getMessage());
             return toJson(listGamesResponse);
+        }
+    }
+    public Object createGame(Request req, Response res) throws DataAccessException {
+        CreateGameRequest request = gson.fromJson(req.body(), CreateGameRequest.class);
+        request = request.setAuthToken(req.headers("authorization"));
+
+        try {
+            authService.isAuthorized(request.authToken());
+            CreateGameResponse createGameResponse = gameService.createGame(request);
+            res.status(200);
+            return toJson(createGameResponse);
+        } catch (BadRequestException ex) {
+            res.status(400);
+            CreateGameResponse createGameResponse = new CreateGameResponse(null, ex.getMessage());
+            return toJson(createGameResponse);
+        } catch (UnauthorizedException ex) {
+            res.status(401);
+            CreateGameResponse createGameResponse = new CreateGameResponse(null, ex.getMessage());
+            return toJson(createGameResponse);
         }
     }
 
