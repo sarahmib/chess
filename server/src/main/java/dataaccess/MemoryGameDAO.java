@@ -2,10 +2,12 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import model.UserData;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
 
@@ -29,5 +31,21 @@ public class MemoryGameDAO implements GameDAO {
         Integer gameID = nextId;
         nextId++;
         return gameID;
+    }
+
+    @Override
+    public GameData getGame(int gameId) throws DataAccessException {
+        for (Map.Entry<Integer, GameData> entry : games.entrySet()) {
+            GameData gameData = entry.getValue();
+            if (gameData.gameID() == gameId) {
+                return gameData;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void updateGame(GameData gameData) throws DataAccessException {
+        games.put(gameData.gameID(), gameData);
     }
 }

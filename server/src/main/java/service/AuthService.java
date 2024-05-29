@@ -41,9 +41,11 @@ public class AuthService {
         return new LogoutResponse(null);
     }
 
-    public void isAuthorized(String authToken) throws DataAccessException {
-        if (authDataAccess.getAuth(authToken) == null) {
+    public AuthData isAuthorized(String authToken) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
+        return authData;
     }
 }

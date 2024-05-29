@@ -108,6 +108,31 @@ public class Handler {
         }
     }
 
+    public Object joinGame(Request req, Response res) throws DataAccessException {
+        JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
+
+        try {
+            AuthData authData = authService.isAuthorized(req.headers("authorization"));
+            request = request.setUsername(authData.username());
+            JoinGameResponse joinGameResponse = gameService.joinGame(request);
+            res.status(200);
+            return toJson(joinGameResponse);
+
+        } catch (BadRequestException ex) {
+            res.status(400);
+            JoinGameResponse joinGameResponse = new JoinGameResponse(ex.getMessage());
+            return toJson(joinGameResponse);
+        } catch (UnauthorizedException ex) {
+            res.status(401);
+            JoinGameResponse joinGameResponse = new JoinGameResponse(ex.getMessage());
+            return toJson(joinGameResponse);
+        } catch (AlreadyTakenException ex) {
+            res.status(403);
+            JoinGameResponse joinGameResponse = new JoinGameResponse(ex.getMessage());
+            return toJson(joinGameResponse);
+        }
+    }
+
     public Object clearDb(Request req, Response res) throws DataAccessException {
         userService.clearUsers();
         gameService.clearGames();
