@@ -1,9 +1,9 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadRequestException;
+import dataaccess.Exceptions.DataAccessException;
 import dataaccess.GameDAO;
 import model.GameData;
 import request.CreateGameRequest;
@@ -16,10 +16,12 @@ import java.util.Collection;
 
 public class GameService {
     private final GameDAO gameDataAccess;
+    private final AuthService authService;
 
 
-    public GameService(GameDAO gameDataAccess) {
+    public GameService(GameDAO gameDataAccess, AuthService authService) {
         this.gameDataAccess = gameDataAccess;
+        this.authService = authService;
     }
 
     public void clearGames() throws DataAccessException {

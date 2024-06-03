@@ -1,14 +1,8 @@
 package service;
-import dataaccess.AuthDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.MemoryDAO.MemoryAuthDAO;
+import dataaccess.MemoryDAO.MemoryGameDAO;
+import dataaccess.MemoryDAO.MemoryUserDAO;
 import org.junit.jupiter.api.*;
-import passoff.model.TestAuthResult;
-import passoff.model.TestCreateRequest;
-import passoff.model.TestUser;
-import passoff.server.TestServerFacade;
-import server.Server;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -22,8 +16,8 @@ public class ServiceTests {
     @BeforeAll
     public static void init() {
         authService = new AuthService(new MemoryAuthDAO());
-        gameService = new GameService(new MemoryGameDAO());
-        userService = new UserService(new MemoryUserDAO());
+        gameService = new GameService(new MemoryGameDAO(), authService);
+        userService = new UserService(new MemoryUserDAO(), authService);
     }
 
     @BeforeEach

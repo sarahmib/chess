@@ -1,6 +1,12 @@
 package server;
 
-import dataaccess.*;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadRequestException;
+import dataaccess.Exceptions.DataAccessException;
+import dataaccess.Exceptions.UnauthorizedException;
+import dataaccess.MemoryDAO.MemoryAuthDAO;
+import dataaccess.MemoryDAO.MemoryGameDAO;
+import dataaccess.MemoryDAO.MemoryUserDAO;
 import model.AuthData;
 import request.*;
 import response.*;
@@ -20,9 +26,10 @@ public class Handler {
     private final Gson gson;
 
     public Handler() {
-        userService = new UserService(new MemoryUserDAO());
-        gameService = new GameService(new MemoryGameDAO());
         authService = new AuthService(new MemoryAuthDAO());
+        userService = new UserService(new MemoryUserDAO(), authService);
+        gameService = new GameService(new MemoryGameDAO(), authService);
+
 
         GsonBuilder builder = new GsonBuilder();
         builder.setPrettyPrinting();

@@ -1,12 +1,14 @@
-package dataaccess;
+package dataaccess.MemoryDAO;
 
+import dataaccess.Exceptions.DataAccessException;
+import dataaccess.UserDAO;
 import model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MemoryUserDAO implements UserDAO{
+public class MemoryUserDAO implements UserDAO {
 
     private int nextId = 1;
     final private HashMap<Integer, UserData> users = new HashMap<>();

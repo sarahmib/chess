@@ -1,18 +1,22 @@
 package service;
 
 import dataaccess.*;
-import model.AuthData;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadRequestException;
+import dataaccess.Exceptions.DataAccessException;
+import dataaccess.Exceptions.UnauthorizedException;
 import model.UserData;
 import request.LoginRequest;
 import request.RegisterRequest;
-import response.RegisterResponse;
 
 public class UserService {
     private final UserDAO userDataAccess;
+    private final AuthService authService;
 
 
-    public UserService(UserDAO userDataAccess) {
+    public UserService(UserDAO userDataAccess, AuthService authService) {
         this.userDataAccess = userDataAccess;
+        this.authService = authService;
     }
 
     public void clearUsers() throws DataAccessException {
