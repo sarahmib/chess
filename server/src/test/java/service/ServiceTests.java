@@ -17,7 +17,7 @@ public class ServiceTests {
     public static void init() {
         authService = new AuthService(new MemoryAuthDAO());
         gameService = new GameService(new MemoryGameDAO(), authService);
-        userService = new UserService(new MemoryUserDAO(), authService);
+        userService = new UserService(new MemoryUserDAO());
     }
 
     @BeforeEach

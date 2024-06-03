@@ -11,12 +11,10 @@ import request.RegisterRequest;
 
 public class UserService {
     private final UserDAO userDataAccess;
-    private final AuthService authService;
 
 
-    public UserService(UserDAO userDataAccess, AuthService authService) {
+    public UserService(UserDAO userDataAccess) {
         this.userDataAccess = userDataAccess;
-        this.authService = authService;
     }
 
     public void clearUsers() throws DataAccessException {

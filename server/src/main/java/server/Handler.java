@@ -27,7 +27,7 @@ public class Handler {
 
     public Handler() {
         authService = new AuthService(new MemoryAuthDAO());
-        userService = new UserService(new MemoryUserDAO(), authService);
+        userService = new UserService(new MemoryUserDAO());
         gameService = new GameService(new MemoryGameDAO(), authService);
 
 
@@ -84,8 +84,7 @@ public class Handler {
 
     public Object listGames(Request req, Response res) throws DataAccessException {
         try {
-            authService.isAuthorized(req.headers("authorization"));
-            ListGamesResponse listGamesResponse = gameService.listGames();
+            ListGamesResponse listGamesResponse = gameService.listGames(req.headers("authorization"));
             res.status(200);
             return toJson(listGamesResponse);
         } catch (UnauthorizedException ex) {
@@ -99,7 +98,6 @@ public class Handler {
         request = request.setAuthToken(req.headers("authorization"));
 
         try {
-            authService.isAuthorized(request.authToken());
             CreateGameResponse createGameResponse = gameService.createGame(request);
             res.status(200);
             return toJson(createGameResponse);
@@ -118,9 +116,7 @@ public class Handler {
         JoinGameRequest request = gson.fromJson(req.body(), JoinGameRequest.class);
 
         try {
-            AuthData authData = authService.isAuthorized(req.headers("authorization"));
-            request = request.setUsername(authData.username());
-            JoinGameResponse joinGameResponse = gameService.joinGame(request);
+            JoinGameResponse joinGameResponse = gameService.joinGame(request, req.headers("authorization"));
             res.status(200);
             return toJson(joinGameResponse);
 

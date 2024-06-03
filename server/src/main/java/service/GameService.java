@@ -5,6 +5,7 @@ import dataaccess.Exceptions.AlreadyTakenException;
 import dataaccess.Exceptions.BadRequestException;
 import dataaccess.Exceptions.DataAccessException;
 import dataaccess.GameDAO;
+import model.AuthData;
 import model.GameData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -28,12 +29,15 @@ public class GameService {
         gameDataAccess.clearGames();
     }
 
-    public ListGamesResponse listGames() throws DataAccessException {
+    public ListGamesResponse listGames(String authToken) throws DataAccessException {
+        authService.isAuthorized(authToken);
         Collection<GameData> games = gameDataAccess.listGames();
         return new ListGamesResponse(games, null);
     }
 
     public CreateGameResponse createGame(CreateGameRequest request) throws DataAccessException {
+        authService.isAuthorized(request.authToken());
+
         if (request.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -41,7 +45,10 @@ public class GameService {
         return new CreateGameResponse(gameID, null);
     }
 
-    public JoinGameResponse joinGame(JoinGameRequest request) throws DataAccessException {
+    public JoinGameResponse joinGame(JoinGameRequest request, String authToken) throws DataAccessException {
+        AuthData authData = authService.isAuthorized(authToken);
+        request = request.setUsername(authData.username());
+
         if (request.gameID() == null || request.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
         }
