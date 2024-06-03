@@ -21,7 +21,7 @@ public class AuthService {
         authDataAccess.clearAuths();
     }
 
-    public AuthData createAuth(String username) throws DataAccessException {
+    private AuthData createAuth(String username) throws DataAccessException {
         return authDataAccess.createAuth(username);
     }
 

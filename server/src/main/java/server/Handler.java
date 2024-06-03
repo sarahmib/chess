@@ -27,7 +27,7 @@ public class Handler {
 
     public Handler() {
         authService = new AuthService(new MemoryAuthDAO());
-        userService = new UserService(new MemoryUserDAO());
+        userService = new UserService(new MemoryUserDAO(), authService);
         gameService = new GameService(new MemoryGameDAO(), authService);
 
 
@@ -40,8 +40,7 @@ public class Handler {
     public Object register(Request req, Response res) throws DataAccessException {
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
         try {
-            userService.register(request);
-            RegisterResponse registerResponse = authService.register(request.username());
+            RegisterResponse registerResponse = userService.register(request);;
             res.status(200);
             return toJson(registerResponse);
         } catch (AlreadyTakenException ex) {

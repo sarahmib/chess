@@ -8,20 +8,23 @@ import dataaccess.Exceptions.UnauthorizedException;
 import model.UserData;
 import request.LoginRequest;
 import request.RegisterRequest;
+import response.RegisterResponse;
 
 public class UserService {
     private final UserDAO userDataAccess;
+    private final AuthService authService;
 
 
-    public UserService(UserDAO userDataAccess) {
+    public UserService(UserDAO userDataAccess, AuthService authService) {
         this.userDataAccess = userDataAccess;
+        this.authService = authService;
     }
 
     public void clearUsers() throws DataAccessException {
         userDataAccess.clearUsers();
     }
 
-    public void register(RegisterRequest request) throws DataAccessException {
+    public RegisterResponse register(RegisterRequest request) throws DataAccessException {
         if (request.username() == null || request.password() == null || request.email() == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -33,6 +36,7 @@ public class UserService {
         }
 
         userDataAccess.createUser(request.username(), request.password(), request.email());
+        return authService.register(request.username());
     }
 
     public void login(LoginRequest request) throws DataAccessException {
