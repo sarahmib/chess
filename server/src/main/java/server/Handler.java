@@ -7,7 +7,9 @@ import dataaccess.Exceptions.UnauthorizedException;
 import dataaccess.MemoryDAO.MemoryAuthDAO;
 import dataaccess.MemoryDAO.MemoryGameDAO;
 import dataaccess.MemoryDAO.MemoryUserDAO;
-import model.AuthData;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
 import request.*;
 import response.*;
 import service.AuthService;
@@ -26,9 +28,9 @@ public class Handler {
     private final Gson gson;
 
     public Handler() {
-        authService = new AuthService(new MemoryAuthDAO());
-        userService = new UserService(new MemoryUserDAO(), authService);
-        gameService = new GameService(new MemoryGameDAO(), authService);
+        authService = new AuthService(new SQLAuthDAO());
+        userService = new UserService(new SQLUserDAO(), authService);
+        gameService = new GameService(new SQLGameDAO(), authService);
 
 
         GsonBuilder builder = new GsonBuilder();
