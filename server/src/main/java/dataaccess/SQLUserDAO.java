@@ -5,6 +5,8 @@ import model.UserData;
 
 import java.sql.SQLException;
 
+import static dataaccess.SQLExecution.executeUpdate;
+
 public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() throws DataAccessException {
@@ -13,7 +15,8 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clearUsers() throws DataAccessException {
-
+        var statement = "DELETE users";
+        executeUpdate(statement);
     }
 
     @Override

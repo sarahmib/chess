@@ -5,6 +5,8 @@ import model.AuthData;
 
 import java.sql.SQLException;
 
+import static dataaccess.SQLExecution.executeUpdate;
+
 public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException {
@@ -13,7 +15,8 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void clearAuths() throws DataAccessException {
-
+        var statement = "DELETE auths";
+        executeUpdate(statement);
     }
 
     @Override

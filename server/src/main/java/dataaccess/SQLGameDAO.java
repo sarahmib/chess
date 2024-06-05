@@ -1,11 +1,16 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.Exceptions.DataAccessException;
 import model.GameData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+
+import static dataaccess.SQLExecution.executeUpdate;
 
 public class SQLGameDAO implements GameDAO {
 
@@ -15,7 +20,8 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void clearGames() throws DataAccessException {
-
+        String statement = "DELETE games";
+        executeUpdate(statement);
     }
 
     @Override
@@ -56,6 +62,11 @@ public class SQLGameDAO implements GameDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
+
+    private ChessGame readChessGame(ResultSet rs) throws SQLException {
+        var json = rs.getString("game");
+        return new Gson().fromJson(json, ChessGame.class);
+    }
 
     private void configureGameTable() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {

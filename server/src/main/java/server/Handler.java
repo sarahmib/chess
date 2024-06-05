@@ -1,6 +1,5 @@
 package server;
 
-import dataaccess.DatabaseManager;
 import dataaccess.Exceptions.AlreadyTakenException;
 import dataaccess.Exceptions.BadRequestException;
 import dataaccess.Exceptions.DataAccessException;
@@ -20,6 +19,8 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import static dataaccess.SQLExecution.configureDatabase;
 
 public class Handler {
 
@@ -154,7 +155,4 @@ public class Handler {
         return resultAsJson;
     }
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-    }
 }
