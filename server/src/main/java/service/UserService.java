@@ -8,6 +8,7 @@ import dataaccess.Exceptions.UnauthorizedException;
 import model.UserData;
 import request.LoginRequest;
 import request.RegisterRequest;
+import response.LoginResponse;
 import response.RegisterResponse;
 
 public class UserService {
@@ -39,9 +40,10 @@ public class UserService {
         return authService.register(request.username());
     }
 
-    public void login(LoginRequest request) throws DataAccessException {
+    public LoginResponse login(LoginRequest request) throws DataAccessException {
         if (!userDataAccess.findUser(request.username(), request.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
+        return authService.login(request.username());
     }
 }

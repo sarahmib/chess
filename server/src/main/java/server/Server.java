@@ -8,7 +8,15 @@ public class Server {
     private final Handler handler;
 
     public Server() {
-        handler = new Handler();
+        Handler handlerTemp;
+        try {
+            handlerTemp = new Handler();
+        } catch (DataAccessException e) {
+            handlerTemp = null;
+            System.out.println("Something went wrong: " + e.getMessage());
+            System.exit(1);
+        }
+        handler = handlerTemp;
     }
 
     public int run(int desiredPort) {

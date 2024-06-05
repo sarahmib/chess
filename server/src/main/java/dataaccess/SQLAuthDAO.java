@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        configureAuthTable();
     }
 
     @Override
@@ -31,25 +31,20 @@ public class SQLAuthDAO implements AuthDAO {
         return null;
     }
 
-    private final String[] createStatements = {
+    private final String[] createAuthStatements = {
             """
             CREATE TABLE IF NOT EXISTS  auths (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `name` varchar(256) NOT NULL,
-              `type` ENUM('CAT', 'DOG', 'FISH', 'FROG', 'ROCK') DEFAULT 'CAT',
-              `json` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(type),
-              INDEX(name)
+              `authToken` VARCHAR(255) NOT NULL,
+              `username` VARCHAR(255) NOT NULL,
+              PRIMARY KEY (`authToken`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
+    private void configureAuthTable() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : createAuthStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }

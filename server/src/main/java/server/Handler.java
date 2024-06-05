@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.DatabaseManager;
 import dataaccess.Exceptions.AlreadyTakenException;
 import dataaccess.Exceptions.BadRequestException;
 import dataaccess.Exceptions.DataAccessException;
@@ -27,7 +28,9 @@ public class Handler {
     private final AuthService authService;
     private final Gson gson;
 
-    public Handler() {
+    public Handler() throws DataAccessException {
+        configureDatabase();
+
         authService = new AuthService(new SQLAuthDAO());
         userService = new UserService(new SQLUserDAO(), authService);
         gameService = new GameService(new SQLGameDAO(), authService);
@@ -59,8 +62,7 @@ public class Handler {
     public Object login(Request req, Response res) throws DataAccessException {
         LoginRequest request = gson.fromJson(req.body(), LoginRequest.class);
         try {
-            userService.login(request);
-            LoginResponse loginResponse = authService.login(request.username());
+            LoginResponse loginResponse = userService.login(request);
             res.status(200);
             return toJson(loginResponse);
         } catch (UnauthorizedException ex) {
@@ -150,5 +152,9 @@ public class Handler {
         resultAsJson = gson.toJson(response);
         System.out.println(resultAsJson);
         return resultAsJson;
+    }
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
     }
 }
