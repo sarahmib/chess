@@ -1,6 +1,8 @@
 package dataaccess;
 
+import chess.ChessGame;
 import dataaccess.Exceptions.DataAccessException;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
@@ -124,6 +126,29 @@ public class DataAccessTests {
     @DisplayName("Create game invalid input")
     public void createGameInvalidInput() {
         assertThrows(DataAccessException.class, () -> {gameDAO.createGame(null);});
+    }
+
+    @Test
+    @DisplayName("Get game success")
+    public void getGameSuccess() {
+        Integer gameId = assertDoesNotThrow(() -> gameDAO.createGame("newGame"));
+        GameData game = assertDoesNotThrow(() -> gameDAO.getGame(gameId));
+
+        assertEquals(gameId, game.gameID());
+        assertNull(game.whiteUsername());
+        assertNull(game.blackUsername());
+        assertEquals("newGame", game.gameName());
+        ChessGame testGame = new ChessGame();
+        assertEquals(testGame, game.game());
+    }
+
+    @Test
+    @DisplayName("Get nonexistent game")
+    public void getGameDoesNotExist() {
+        assertDoesNotThrow(() ->gameDAO.createGame("newGame"));
+        GameData game = assertDoesNotThrow(() -> gameDAO.getGame(2));
+
+        assertNull(game, "Game should return as null");
     }
 }
 
