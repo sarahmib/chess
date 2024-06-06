@@ -6,14 +6,14 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
+import static dataaccess.SQLExecution.configureTable;
 import static dataaccess.SQLExecution.executeUpdate;
 
 public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() throws DataAccessException {
-        configureUserTable();
+        configureTable(createUserStatements);
     }
 
     @Override
@@ -78,16 +78,4 @@ public class SQLUserDAO implements UserDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-    private void configureUserTable() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createUserStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

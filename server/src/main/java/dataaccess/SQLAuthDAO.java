@@ -5,15 +5,15 @@ import model.AuthData;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
+import static dataaccess.SQLExecution.configureTable;
 import static dataaccess.SQLExecution.executeUpdate;
 
 public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException {
-        configureAuthTable();
+        configureTable(createAuthStatements);
     }
 
     @Override
@@ -65,18 +65,4 @@ public class SQLAuthDAO implements AuthDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-
-    private void configureAuthTable() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createAuthStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
 }

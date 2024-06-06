@@ -2,10 +2,12 @@ package dataaccess;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import com.google.gson.*;
 import model.GameData;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,12 +15,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static dataaccess.SQLExecution.configureTable;
 import static dataaccess.SQLExecution.executeUpdate;
 
 public class SQLGameDAO implements GameDAO {
     private final Gson gson;
     public SQLGameDAO() throws DataAccessException {
-        configureGameTable();
+        configureTable(createGameStatements);
         gson = new GsonBuilder()
                 .registerTypeAdapter(ChessBoard.class, new ChessBoardDeserializer())
                 .create();
@@ -57,6 +60,30 @@ public class SQLGameDAO implements GameDAO {
         String resultGameName = resultSet.getString("gameName");
         ChessGame resultChessGame = gson.fromJson(resultSet.getString("game"), ChessGame.class);
         return new GameData(resultID, resultWhiteUsername, resultBlackUsername, resultGameName, resultChessGame);
+    }
+
+    public class ChessBoardDeserializer implements JsonDeserializer<ChessBoard> {
+
+        @Override
+        public ChessBoard deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = json.getAsJsonObject();
+            JsonArray boardArray = jsonObject.getAsJsonArray("board");
+
+            ChessBoard board = new ChessBoard();
+
+            for (int i = 0; i < boardArray.size(); i++) {
+                JsonArray row = boardArray.get(i).getAsJsonArray();
+                for (int j = 0; j < row.size(); j++) {
+                    JsonElement element = row.get(j);
+                    if (element != null && !element.isJsonNull()) {
+                        ChessPiece piece = context.deserialize(element, ChessPiece.class);
+                        board.addPiece(new ChessPosition(i + 1, j + 1), piece);
+                    }
+                }
+            }
+
+            return board;
+        }
     }
 
     @Override
@@ -118,16 +145,4 @@ public class SQLGameDAO implements GameDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-    private void configureGameTable() throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createGameStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

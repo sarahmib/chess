@@ -36,4 +36,16 @@ public class SQLExecution {
     public static void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
     }
+
+    public static void configureTable(String[] createTableStatements) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createTableStatements) {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
+    }
 }
