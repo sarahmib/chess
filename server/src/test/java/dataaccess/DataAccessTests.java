@@ -111,5 +111,19 @@ public class DataAccessTests {
             assertFalse(userExists, "The password is incorrect and the method should return false.");
         });
     }
+
+    @Test
+    @DisplayName("Create game success")
+    public void createGameSuccess() {
+        assertDoesNotThrow(() -> {Integer gameId = gameDAO.createGame("newGame");
+            assertEquals(1, gameId);});
+
+    }
+
+    @Test
+    @DisplayName("Create game invalid input")
+    public void createGameInvalidInput() {
+        assertThrows(DataAccessException.class, () -> {gameDAO.createGame(null);});
+    }
 }
 
