@@ -11,8 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static dataaccess.SQLExecution.executeUpdate;
 
@@ -35,7 +35,29 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of();
+        Collection<GameData> games = new ArrayList<GameData>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT GameID, whiteUsername, blackUsername, gameName, game FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        games.add(readGame(rs));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to retrieve data: " + e.getMessage());
+        }
+        return games;
+    }
+
+    private GameData readGame(ResultSet resultSet) throws SQLException {
+        int resultID = resultSet.getInt("GameID");
+        String resultWhiteUsername = resultSet.getString("whiteUsername");
+        String resultBlackUsername = resultSet.getString("blackUsername");
+        String resultGameName = resultSet.getString("gameName");
+        ChessGame resultChessGame = gson.fromJson(resultSet.getString("game"), ChessGame.class);
+        return new GameData(resultID, resultWhiteUsername, resultBlackUsername, resultGameName, resultChessGame);
     }
 
     @Override
@@ -53,12 +75,7 @@ public class SQLGameDAO implements GameDAO {
                 ps.setInt(1, gameId);
                 try (ResultSet resultSet = ps.executeQuery()) {
                     if (resultSet.next()) {
-                        int resultID = resultSet.getInt("GameID");
-                        String resultWhiteUsername = resultSet.getString("whiteUsername");
-                        String resultBlackUsername = resultSet.getString("blackUsername");
-                        String resultGameName = resultSet.getString("gameName");
-                        ChessGame resultChessGame = gson.fromJson(resultSet.getString("game"), ChessGame.class);
-                        return new GameData(resultID, resultWhiteUsername, resultBlackUsername, resultGameName, resultChessGame);
+                        return readGame(resultSet);
                     }
                 }
             }

@@ -8,6 +8,10 @@ import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
 import server.Handler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import static dataaccess.SQLExecution.configureDatabase;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -175,6 +179,39 @@ public class DataAccessTests {
         GameData game = assertDoesNotThrow(() -> gameDAO.getGame(gameId));
         GameData updatedGame = new GameData(2, "wUsername", "bUsername", game.gameName(), game.game());
         assertDoesNotThrow(() ->gameDAO.updateGame(updatedGame), "Does not throw even with bad input");
+    }
+
+    @Test
+    @DisplayName("List games two games")
+    public void listGamesTwoGames() {
+
+        int gameIdOne = assertDoesNotThrow(() ->gameDAO.createGame("newGameOne"));
+        int gameIdTwo = assertDoesNotThrow(() ->gameDAO.createGame("newGameTwo"));
+
+        GameData gameOne = assertDoesNotThrow(() -> gameDAO.getGame(gameIdOne));
+        GameData gameTwo = assertDoesNotThrow(() -> gameDAO.getGame(gameIdTwo));
+
+        Collection<GameData> games = assertDoesNotThrow(() -> gameDAO.listGames());
+        List<GameData> gameList = new ArrayList<>(games);
+
+        assertEquals(gameOne.gameID(), gameList.get(0).gameID());
+        assertEquals(gameOne.whiteUsername(), gameList.get(0).whiteUsername());
+        assertEquals(gameOne.blackUsername(), gameList.get(0).blackUsername());
+        assertEquals(gameOne.gameName(), gameList.get(0).gameName());
+        assertEquals(gameOne.game(), gameList.get(0).game());
+
+        assertEquals(gameTwo.gameID(), gameList.get(1).gameID());
+        assertEquals(gameTwo.whiteUsername(), gameList.get(1).whiteUsername());
+        assertEquals(gameTwo.blackUsername(), gameList.get(1).blackUsername());
+        assertEquals(gameTwo.gameName(), gameList.get(1).gameName());
+        assertEquals(gameTwo.game(), gameList.get(1).game());
+    }
+
+    @Test
+    @DisplayName("List games no games")
+    public void listGamesNoGames() {
+        Collection<GameData> games = assertDoesNotThrow(() -> gameDAO.listGames());
+        assertTrue(games.isEmpty());
     }
 }
 
