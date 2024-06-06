@@ -1,9 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
 import dataaccess.Exceptions.DataAccessException;
 import model.AuthData;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import static dataaccess.SQLExecution.executeUpdate;
 
@@ -21,7 +23,10 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
-        return null;
+        String authToken = UUID.randomUUID().toString();
+        String statement = "INSERT INTO auths (authToken, username) VALUES(?, ?)";
+        executeUpdate(statement, authToken, username);
+        return new AuthData(authToken, username);
     }
 
     @Override

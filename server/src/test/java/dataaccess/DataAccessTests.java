@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import dataaccess.Exceptions.DataAccessException;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -212,6 +213,19 @@ public class DataAccessTests {
     public void listGamesNoGames() {
         Collection<GameData> games = assertDoesNotThrow(() -> gameDAO.listGames());
         assertTrue(games.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Create auth success")
+    public void testCreateAuthSuccess() {
+        AuthData authData = assertDoesNotThrow(() -> authDAO.createAuth("username"));
+        assertEquals("username", authData.username());
+    }
+
+    @Test
+    @DisplayName("Create auth bad input")
+    public void testCreateAuthBadInput() {
+        assertThrows(DataAccessException.class, () -> {authDAO.createAuth(null);});
     }
 }
 
