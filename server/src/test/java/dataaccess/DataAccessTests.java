@@ -1,12 +1,13 @@
 package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
+import model.UserData;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.Handler;
 
 import static dataaccess.SQLExecution.configureDatabase;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class DataAccessTests {
@@ -67,6 +68,28 @@ public class DataAccessTests {
     @DisplayName("Create user error")
     public void testCreateUserError() {
         assertThrows(DataAccessException.class, () -> {userDAO.createUser(null, "password", "email@email.com");});
+    }
+
+    @Test
+    @DisplayName("Get user success")
+    public void testGetUserSuccess() {
+        assertDoesNotThrow(() -> userDAO.createUser("username", "password", "email@email.com"));
+
+        UserData user = assertDoesNotThrow(() -> userDAO.getUser("username"));
+
+
+        assertNotNull(user, "User should not be null");
+        assertEquals("username", user.username(), "Username should match");
+        assertTrue(BCrypt.checkpw("password", user.password()), "Password should match");
+        assertEquals("email@email.com", user.email(), "Email should match");
+    }
+
+    @Test
+    @DisplayName("Get nonexistent user")
+    public void testGetUserDoesNotExist() {
+        UserData user = assertDoesNotThrow(() -> userDAO.getUser("notARegisteredUser"));
+
+        assertNull(user, "User should return as null");
     }
 }
 
