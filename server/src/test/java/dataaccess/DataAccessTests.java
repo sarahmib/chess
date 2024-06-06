@@ -91,5 +91,25 @@ public class DataAccessTests {
 
         assertNull(user, "User should return as null");
     }
+
+    @Test
+    @DisplayName("Find user success")
+    public void testFindUserSuccess() {
+        assertDoesNotThrow(() -> userDAO.createUser("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> {
+            boolean userExists = userDAO.findUser("username", "password");
+            assertTrue(userExists, "The user should be found and the method should return true.");
+        });
+    }
+
+    @Test
+    @DisplayName("Find user wrong password")
+    public void testFindUserWrongPassword() {
+        assertDoesNotThrow(() -> userDAO.createUser("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> {
+            boolean userExists = userDAO.findUser("username", "pasword");
+            assertFalse(userExists, "The password is incorrect and the method should return false.");
+        });
+    }
 }
 

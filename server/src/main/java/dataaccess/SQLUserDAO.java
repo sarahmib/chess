@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 
 import static dataaccess.SQLExecution.executeUpdate;
 
@@ -54,6 +55,19 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public boolean findUser(String username, String password) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT password FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    if (resultSet.next() && BCrypt.checkpw(password, resultSet.getString("password"))) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return false;
     }
 
