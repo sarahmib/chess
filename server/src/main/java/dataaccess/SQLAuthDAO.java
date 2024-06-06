@@ -3,7 +3,11 @@ package dataaccess;
 import chess.ChessGame;
 import dataaccess.Exceptions.DataAccessException;
 import model.AuthData;
+import model.UserData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -31,11 +35,27 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        String statement = "DELETE FROM auths WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken, username FROM auths WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    if (resultSet.next()) {
+                        String resultAuthToken = resultSet.getString("authToken");
+                        String resultUsername = resultSet.getString("username");
+                        return new AuthData(resultAuthToken, resultUsername);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 

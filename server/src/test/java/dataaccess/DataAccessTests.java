@@ -12,6 +12,7 @@ import server.Handler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static dataaccess.SQLExecution.configureDatabase;
 import static org.junit.jupiter.api.Assertions.*;
@@ -226,6 +227,39 @@ public class DataAccessTests {
     @DisplayName("Create auth bad input")
     public void testCreateAuthBadInput() {
         assertThrows(DataAccessException.class, () -> {authDAO.createAuth(null);});
+    }
+
+    @Test
+    @DisplayName("Get auth exists")
+    public void testGetAuthExists() {
+        AuthData authData = assertDoesNotThrow(() -> authDAO.createAuth("username"));
+        AuthData result = assertDoesNotThrow(() -> authDAO.getAuth(authData.authToken()));
+        assertEquals("username", result.username());
+    }
+
+    @Test
+    @DisplayName("Get auth does not exist")
+    public void testGetAuthDoesNotExist() {
+        assertDoesNotThrow(() -> authDAO.createAuth("username"));
+        String randomAuthToken = UUID.randomUUID().toString();
+        AuthData result = assertDoesNotThrow(() -> authDAO.getAuth(randomAuthToken));
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Delete auth exists")
+    public void testDeleteAuthExists() {
+        AuthData authData = assertDoesNotThrow(() -> authDAO.createAuth("username"));
+        assertDoesNotThrow(() -> authDAO.deleteAuth(authData.authToken()));
+        AuthData result = assertDoesNotThrow(() -> authDAO.getAuth(authData.authToken()));
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Delete auth does not exist")
+    public void testDeleteAuthDoesNotExist() {
+        String authToken = UUID.randomUUID().toString();
+        assertDoesNotThrow(() -> authDAO.deleteAuth(authToken));
     }
 }
 
