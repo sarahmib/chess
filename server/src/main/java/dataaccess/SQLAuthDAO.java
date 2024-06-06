@@ -15,7 +15,7 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void clearAuths() throws DataAccessException {
-        var statement = "DELETE auths";
+        var statement = "DELETE FROM auths";
         executeUpdate(statement);
     }
 

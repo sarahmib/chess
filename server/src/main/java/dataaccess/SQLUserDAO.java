@@ -2,6 +2,7 @@ package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -15,7 +16,7 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clearUsers() throws DataAccessException {
-        var statement = "DELETE users";
+        var statement = "DELETE FROM users";
         executeUpdate(statement);
     }
 
@@ -26,7 +27,9 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(String username, String password, String email) throws DataAccessException {
-
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        String statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(statement, username, hashedPassword, email);
     }
 
     @Override

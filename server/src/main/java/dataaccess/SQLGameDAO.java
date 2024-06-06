@@ -20,7 +20,7 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void clearGames() throws DataAccessException {
-        String statement = "DELETE games";
+        String statement = "DELETE FROM games";
         executeUpdate(statement);
     }
 

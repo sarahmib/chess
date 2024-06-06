@@ -6,6 +6,7 @@ import server.Handler;
 
 import static dataaccess.SQLExecution.configureDatabase;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class DataAccessTests {
@@ -54,6 +55,18 @@ public class DataAccessTests {
     @DisplayName("User clear")
     public void testUserClear() {
         assertDoesNotThrow(() -> userDAO.clearUsers());
+    }
+
+    @Test
+    @DisplayName("Create user success")
+    public void testCreateUserSuccess() {
+        assertDoesNotThrow(() -> userDAO.createUser("username", "password", "email@email.com"));
+    }
+
+    @Test
+    @DisplayName("Create user error")
+    public void testCreateUserError() {
+        assertThrows(DataAccessException.class, () -> {userDAO.createUser(null, "password", "email@email.com");});
     }
 }
 
