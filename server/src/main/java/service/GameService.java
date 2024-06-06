@@ -1,9 +1,9 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.Exceptions.AlreadyTakenException;
-import dataaccess.Exceptions.BadRequestException;
-import dataaccess.Exceptions.DataAccessException;
+import dataaccess.AlreadyTakenException;
+import dataaccess.BadRequestException;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;

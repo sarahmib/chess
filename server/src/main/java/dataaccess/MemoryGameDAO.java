@@ -1,8 +1,6 @@
-package dataaccess.MemoryDAO;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.Exceptions.DataAccessException;
-import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.Collection;

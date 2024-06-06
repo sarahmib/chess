@@ -4,7 +4,6 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dataaccess.Exceptions.DataAccessException;
 import model.GameData;
 
 import java.sql.Connection;

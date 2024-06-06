@@ -1,12 +1,9 @@
 package server;
 
-import dataaccess.Exceptions.AlreadyTakenException;
-import dataaccess.Exceptions.BadRequestException;
-import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.UnauthorizedException;
-import dataaccess.MemoryDAO.MemoryAuthDAO;
-import dataaccess.MemoryDAO.MemoryGameDAO;
-import dataaccess.MemoryDAO.MemoryUserDAO;
+import dataaccess.AlreadyTakenException;
+import dataaccess.BadRequestException;
+import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
 import dataaccess.SQLUserDAO;

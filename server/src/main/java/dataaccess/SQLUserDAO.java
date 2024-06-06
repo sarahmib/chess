@@ -1,6 +1,5 @@
 package dataaccess;
 
-import dataaccess.Exceptions.DataAccessException;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -8,8 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Objects;
 
 import static dataaccess.SQLExecution.executeUpdate;
 

@@ -1,7 +1,7 @@
 package service;
-import dataaccess.MemoryDAO.MemoryAuthDAO;
-import dataaccess.MemoryDAO.MemoryGameDAO;
-import dataaccess.MemoryDAO.MemoryUserDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
