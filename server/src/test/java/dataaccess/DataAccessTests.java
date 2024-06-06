@@ -150,5 +150,31 @@ public class DataAccessTests {
 
         assertNull(game, "Game should return as null");
     }
+
+    @Test
+    @DisplayName("Update game successfully")
+    public void updateGameSuccess() {
+        assertDoesNotThrow(() -> userDAO.createUser("wUsername", "password", "email@email.com"));
+        assertDoesNotThrow(() -> userDAO.createUser("bUsername", "password", "email@email.com"));
+        int gameId = assertDoesNotThrow(() ->gameDAO.createGame("newGame"));
+
+        GameData game = assertDoesNotThrow(() -> gameDAO.getGame(gameId));
+        GameData updatedGame = new GameData(game.gameID(), "wUsername", "bUsername", game.gameName(), game.game());
+        assertDoesNotThrow(() ->gameDAO.updateGame(updatedGame));
+        game = assertDoesNotThrow(() -> gameDAO.getGame(gameId));
+
+        assertEquals("wUsername", game.whiteUsername());
+        assertEquals("bUsername", game.blackUsername());
+    }
+
+    @Test
+    @DisplayName("Update game bad input")
+    public void updateGameBadInput() {
+        int gameId = assertDoesNotThrow(() ->gameDAO.createGame("newGame"));
+
+        GameData game = assertDoesNotThrow(() -> gameDAO.getGame(gameId));
+        GameData updatedGame = new GameData(2, "wUsername", "bUsername", game.gameName(), game.game());
+        assertDoesNotThrow(() ->gameDAO.updateGame(updatedGame), "Does not throw even with bad input");
+    }
 }
 

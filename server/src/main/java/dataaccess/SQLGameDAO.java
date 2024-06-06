@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.Exceptions.DataAccessException;
 import model.GameData;
-import model.UserData;
-import request.CreateGameRequest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -72,7 +70,18 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
-
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE games SET whiteUsername=?, blackUsername=?, game=? WHERE GameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameData.whiteUsername());
+                ps.setString(2, gameData.blackUsername());
+                ps.setString(3, gson.toJson(gameData.game()));
+                ps.setInt(4, gameData.gameID());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to update data: %s", e.getMessage()));
+        }
     }
 
     private final String[] createGameStatements = {
@@ -93,11 +102,6 @@ public class SQLGameDAO implements GameDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
-    private ChessGame readChessGame(ResultSet rs) throws SQLException {
-        var json = rs.getString("game");
-        return new Gson().fromJson(json, ChessGame.class);
-    }
 
     private void configureGameTable() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
