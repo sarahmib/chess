@@ -6,13 +6,10 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
 import request.CreateGameRequest;
+import request.ListGamesRequest;
 import request.LoginRequest;
-import request.LogoutRequest;
 import request.RegisterRequest;
-import response.CreateGameResponse;
-import response.LoginResponse;
-import response.LogoutResponse;
-import response.RegisterResponse;
+import response.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +49,11 @@ public class ServerFacade {
     public CreateGameResponse createGame(String gameId, String authToken) throws DataAccessException {
         String path = "/game";
         return this.makeRequest("POST", path, new CreateGameRequest(gameId, null), CreateGameResponse.class, authToken);
+    }
+
+    public ListGamesResponse listGames(String authToken) throws DataAccessException {
+        String path = "/game";
+        return this.makeRequest("GET", path, null, ListGamesResponse.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {

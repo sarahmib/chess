@@ -1,24 +1,25 @@
 package ui;
 
 import dataaccess.DataAccessException;
+import model.GameData;
 import response.CreateGameResponse;
+import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.Collection;
 
 public class ChessClient {
 
     private String playerName = null;
     private String authToken = null;
+    private Collection<GameData> currentGames;
     private final ServerFacade server;
-    private final String serverUrl;
     private State state = State.SIGNEDOUT;
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
 
     public String eval(String input) {
@@ -31,6 +32,7 @@ public class ChessClient {
                 case "register" -> register(params);
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
+                case "listgames" -> listGames();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -89,9 +91,20 @@ public class ChessClient {
 
         String gameName = params[0];
 
-        CreateGameResponse response = server.createGame(gameName, authToken);
+        server.createGame(gameName, authToken);
 
         return "Created game successfully.";
+    }
+
+    public String listGames() throws DataAccessException {
+        ListGamesResponse response = server.listGames(authToken);
+
+        int gameNum = 1;
+        for (GameData data : response.games()) {
+            System.out.println(String.format("%d. Game name: %s\nWhite player: %s\nBlack player: %s\n", gameNum, data.gameName(), data.whiteUsername(), data.blackUsername()));
+        }
+
+        return "End of games list.";
     }
 
     public String help() {
