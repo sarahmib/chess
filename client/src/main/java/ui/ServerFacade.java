@@ -6,8 +6,10 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import response.LoginResponse;
+import response.LogoutResponse;
 import response.RegisterResponse;
 
 import java.io.IOException;
@@ -32,22 +34,32 @@ public class ServerFacade {
 
     public LoginResponse login(String username, String password) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("POST", path, new LoginRequest(username, password), LoginResponse.class);
+        return this.makeRequest("POST", path, new LoginRequest(username, password), LoginResponse.class, null);
     }
 
     public RegisterResponse register(String username, String password, String email) throws DataAccessException {
         String path = "/user";
-        return this.makeRequest("POST", path, new RegisterRequest(username, password, email), RegisterResponse.class);
+        return this.makeRequest("POST", path, new RegisterRequest(username, password, email), RegisterResponse.class, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+    public LogoutResponse logout(String authToken) throws DataAccessException {
+        String path = "/session";
+        return this.makeRequest("DELETE", path, null, LogoutResponse.class, authToken);
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
-            writeBody(request, http);
+            if (request != null) {
+                writeBody(request, http);
+            }
+            if (authToken != null) {
+                http.addRequestProperty("authorization", authToken);
+            }
             http.connect();
             throwIfNotSuccessful(http);
 

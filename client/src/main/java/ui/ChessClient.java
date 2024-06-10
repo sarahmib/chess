@@ -28,6 +28,7 @@ public class ChessClient {
             return switch (cmd) {
                 case "login" -> login(params);
                 case "register" -> register(params);
+                case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -70,6 +71,14 @@ public class ChessClient {
         return String.format("Registered and signed in as %s.", playerName);
     }
 
+    public String logout() throws DataAccessException {
+        server.logout(authToken);
+
+        state = State.SIGNEDOUT;
+
+        return "You have been signed out.";
+    }
+
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
@@ -79,8 +88,8 @@ public class ChessClient {
                     """;
         }
         return """
-                - createGame
-                - joinGame
+                - createGame <game name>
+                - joinGame <game number>
                 - listGames
                 - logout
                 - quit
