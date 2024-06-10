@@ -136,6 +136,28 @@ public class ServerFacadeTests {
         assertThrows(DataAccessException.class, () -> serverFacade.listGames(null));
     }
 
-    // join game
+    @Test
+    @DisplayName("test join game success")
+    public void testJoinGameSuccess() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        CreateGameResponse createGameResponse = assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
+
+        assertDoesNotThrow(() -> serverFacade.joinGame(ChessGame.TeamColor.WHITE, createGameResponse.gameID(), "username", registerResponse.authToken()));
+
+        ListGamesResponse listGamesResponse = assertDoesNotThrow(() -> serverFacade.listGames(registerResponse.authToken()));
+        Collection<GameData> games = listGamesResponse.games();
+        List<GameData> gameList = new ArrayList<>(games);
+
+        assertEquals("username", gameList.getFirst().whiteUsername());
+    }
+
+    @Test
+    @DisplayName("test join game does not exist")
+    public void testJoinGameDoesNotExist() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
+
+        assertThrows(DataAccessException.class, () -> serverFacade.joinGame(ChessGame.TeamColor.WHITE, 2, "username", registerResponse.authToken()));
+    }
     // observe game
 }

@@ -1,11 +1,13 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import response.*;
@@ -55,12 +57,15 @@ public class ServerFacade {
         return this.makeRequest("GET", path, null, ListGamesResponse.class, authToken);
     }
 
+    public JoinGameResponse joinGame(ChessGame.TeamColor teamColor, int gameId, String username, String authToken) throws DataAccessException {
+        String path = "/game";
+        return this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
+    }
+
     public void clearDatabase() throws DataAccessException {
         String path = "/db";
         this.makeRequest("DELETE", path, null, null, null);
     }
-
-    // join game
 
     // observe game
 

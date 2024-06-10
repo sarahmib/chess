@@ -1,13 +1,17 @@
 package ui;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
+import response.JoinGameResponse;
 import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class ChessClient {
 
@@ -32,7 +36,7 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
-                // join game
+                case "joingame" -> joinGame(params);
                 // observe game
                 case "quit" -> "quit";
                 default -> help();
@@ -100,12 +104,47 @@ public class ChessClient {
     public String listGames() throws DataAccessException {
         ListGamesResponse response = server.listGames(authToken);
 
+        currentGames = response.games();
+
         int gameNum = 1;
         for (GameData data : response.games()) {
             System.out.println(String.format("%d. Game name: %s\nWhite player: %s\nBlack player: %s\n", gameNum, data.gameName(), data.whiteUsername(), data.blackUsername()));
+            gameNum++;
         }
 
         return "End of games list.";
+    }
+
+    public String joinGame(String[] params) throws DataAccessException {
+        if (params.length < 2) {
+            throw new DataAccessException("Please the number of the game you want to join and the color you want to play as.");
+        }
+        if (currentGames == null) {
+            throw new DataAccessException("Please be sure to view the list of available games first!");
+        }
+
+        int gameIndex = Integer.parseInt(params[0]) - 1;
+
+        if (gameIndex < 0 || gameIndex >= currentGames.size()) {
+            throw new DataAccessException("This game does not exist.");
+        }
+
+        String playerColorString = params[1];
+
+        ChessGame.TeamColor playerColor;
+
+        if (Objects.equals(playerColorString, "white")) {
+            playerColor = ChessGame.TeamColor.WHITE;
+        } else {
+            playerColor = ChessGame.TeamColor.BLACK;
+        }
+
+        List<GameData> gamesList = (List<GameData>) currentGames;
+        server.joinGame(playerColor, gamesList.get(gameIndex).gameID(), playerName, authToken);
+
+        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+
+        return String.format("Successfully joined game %s", gamesList.get(gameIndex).gameName());
     }
 
     public String help() {
