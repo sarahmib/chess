@@ -1,13 +1,20 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
+import model.GameData;
 import org.junit.jupiter.api.*;
 import response.CreateGameResponse;
+import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import server.Server;
 import ui.ServerFacade;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -98,5 +105,34 @@ public class ServerFacadeTests {
     public void testCreateGameBadInput() {
         RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertThrows(DataAccessException.class, () -> serverFacade.createGame(null, registerResponse.authToken()));
+    }
+
+    @Test
+    @DisplayName("test list games success")
+    public void testListGamesSuccess() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
+
+        ListGamesResponse listGamesResponse = assertDoesNotThrow(() -> serverFacade.listGames(registerResponse.authToken()));
+        Collection<GameData> games = listGamesResponse.games();
+        List<GameData> gameList = new ArrayList<>(games);
+
+        assertEquals(1, games.size());
+
+        GameData testGame = gameList.getFirst();
+
+        assertEquals("newGame", testGame.gameName());
+        assertNull(testGame.blackUsername());
+        assertNull(testGame.whiteUsername());
+        assertEquals(new ChessGame(), testGame.game());
+    }
+
+    @Test
+    @DisplayName("test list games bad auth")
+    public void testListGamesBadAuth() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
+
+        assertThrows(DataAccessException.class, () -> serverFacade.listGames(null));
     }
 }
