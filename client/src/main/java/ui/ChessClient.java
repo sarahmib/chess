@@ -1,6 +1,7 @@
 package ui;
 
 import dataaccess.DataAccessException;
+import response.CreateGameResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 
@@ -29,6 +30,7 @@ public class ChessClient {
                 case "login" -> login(params);
                 case "register" -> register(params);
                 case "logout" -> logout();
+                case "creategame" -> createGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -75,8 +77,21 @@ public class ChessClient {
         server.logout(authToken);
 
         state = State.SIGNEDOUT;
+        authToken = null;
 
         return "You have been signed out.";
+    }
+
+    public String createGame(String[] params) throws DataAccessException {
+        if (params.length < 1) {
+            throw new DataAccessException("Please enter a name for the game.");
+        }
+
+        String gameName = params[0];
+
+        CreateGameResponse response = server.createGame(gameName, authToken);
+
+        return "Created game successfully.";
     }
 
     public String help() {
@@ -85,11 +100,13 @@ public class ChessClient {
                     - login <username> <password>
                     - register <username> <password> <email>
                     - quit
+                    - help
                     """;
         }
         return """
                 - createGame <game name>
-                - joinGame <game number>
+                - joinGame <game number> <desired color (black/white)>
+                - observeGame <game number>
                 - listGames
                 - logout
                 - quit

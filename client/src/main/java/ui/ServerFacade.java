@@ -5,9 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
+import request.CreateGameRequest;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
+import response.CreateGameResponse;
 import response.LoginResponse;
 import response.LogoutResponse;
 import response.RegisterResponse;
@@ -47,26 +49,36 @@ public class ServerFacade {
         return this.makeRequest("DELETE", path, null, LogoutResponse.class, authToken);
     }
 
+    public CreateGameResponse createGame(String gameId, String authToken) throws DataAccessException {
+        String path = "/game";
+        return this.makeRequest("POST", path, new CreateGameRequest(gameId, null), CreateGameResponse.class, authToken);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
+        HttpURLConnection http = null;
         try {
             URL url = (new URI(serverUrl + path)).toURL();
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null) {
+                http.addRequestProperty("authorization", authToken);
+            }
 
             if (request != null) {
                 writeBody(request, http);
             }
-            if (authToken != null) {
-                http.addRequestProperty("authorization", authToken);
-            }
-            http.connect();
-            throwIfNotSuccessful(http);
 
+            throwIfNotSuccessful(http);
 
             return readBody(http, responseClass);
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
+        } finally {
+            if (http != null) {
+                http.disconnect();
+            }
         }
     }
 
