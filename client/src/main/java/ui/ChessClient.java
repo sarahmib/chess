@@ -2,12 +2,14 @@ package ui;
 
 import dataaccess.DataAccessException;
 import response.LoginResponse;
+import response.RegisterResponse;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class ChessClient {
 
-    private String visitorName = null;
+    private String playerName = null;
     private String authToken = null;
     private final ServerFacade server;
     private final String serverUrl;
@@ -25,6 +27,7 @@ public class ChessClient {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "login" -> login(params);
+                case "register" -> register(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -35,7 +38,7 @@ public class ChessClient {
 
     public String login(String [] params) throws DataAccessException {
         if (params.length < 2) {
-            throw new DataAccessException("error: username or password is missing");
+            throw new DataAccessException("username or password is missing.");
         }
         String username = params[0];
         String password = params[1];
@@ -43,20 +46,35 @@ public class ChessClient {
         LoginResponse response = server.login(username, password);
 
         state = State.SIGNEDIN;
-        visitorName = username;
+        playerName = username;
         authToken = response.authToken();
 
+        return String.format("You signed in as %s.", playerName);
+    }
 
+    public String register(String [] params) throws DataAccessException {
+        if (params.length < 3) {
+            throw new DataAccessException("One or more fields are missing.");
+        }
 
-        return String.format("You signed in as %s.", visitorName);
+        String username = params[0];
+        String password = params[1];
+        String email = params[2];
 
+        RegisterResponse response = server.register(username, password, email);
+
+        state = State.SIGNEDIN;
+        playerName = username;
+        authToken = response.authToken();
+
+        return String.format("Registered and signed in as %s.", playerName);
     }
 
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
                     - login <username> <password>
-                    - register
+                    - register <username> <password> <email>
                     - quit
                     """;
         }

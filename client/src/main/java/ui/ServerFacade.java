@@ -6,7 +6,9 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
 import request.LoginRequest;
+import request.RegisterRequest;
 import response.LoginResponse;
+import response.RegisterResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,10 +30,14 @@ public class ServerFacade {
                 .create();
     }
 
-
     public LoginResponse login(String username, String password) throws DataAccessException {
         String path = "/session";
         return this.makeRequest("POST", path, new LoginRequest(username, password), LoginResponse.class);
+    }
+
+    public RegisterResponse register(String username, String password, String email) throws DataAccessException {
+        String path = "/user";
+        return this.makeRequest("POST", path, new RegisterRequest(username, password, email), RegisterResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
@@ -40,8 +46,6 @@ public class ServerFacade {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
-            System.out.println("this ran");
 
             writeBody(request, http);
             http.connect();
