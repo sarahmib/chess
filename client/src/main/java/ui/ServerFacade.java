@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import dataaccess.SQLGameDAO;
 import request.CreateGameRequest;
-import request.ListGamesRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import response.*;
@@ -54,6 +53,11 @@ public class ServerFacade {
     public ListGamesResponse listGames(String authToken) throws DataAccessException {
         String path = "/game";
         return this.makeRequest("GET", path, null, ListGamesResponse.class, authToken);
+    }
+
+    public void clearDatabase() throws DataAccessException {
+        String path = "/db";
+        this.makeRequest("DELETE", path, null, null, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
