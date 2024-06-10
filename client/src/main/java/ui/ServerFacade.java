@@ -67,8 +67,6 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null, null);
     }
 
-    // observe game
-
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         HttpURLConnection http = null;
         try {

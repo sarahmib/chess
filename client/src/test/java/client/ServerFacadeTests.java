@@ -159,5 +159,4 @@ public class ServerFacadeTests {
 
         assertThrows(DataAccessException.class, () -> serverFacade.joinGame(ChessGame.TeamColor.WHITE, 2, "username", registerResponse.authToken()));
     }
-    // observe game
 }

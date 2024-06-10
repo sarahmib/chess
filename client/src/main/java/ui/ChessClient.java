@@ -37,7 +37,7 @@ public class ChessClient {
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
                 case "joingame" -> joinGame(params);
-                // observe game
+                case "observegame" -> observeGame(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -144,7 +144,29 @@ public class ChessClient {
 
         OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
 
-        return String.format("Successfully joined game %s", gamesList.get(gameIndex).gameName());
+        return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
+    }
+
+    public String observeGame(String[] params) throws DataAccessException {
+        if (params.length < 1) {
+            throw new DataAccessException("Please the number of the game you want to join.");
+        }
+        if (currentGames == null) {
+            throw new DataAccessException("Please be sure to view the list of available games first!");
+        }
+
+        int gameIndex = Integer.parseInt(params[0]) - 1;
+
+        if (gameIndex < 0 || gameIndex >= currentGames.size()) {
+            throw new DataAccessException("This game does not exist.");
+        }
+
+        List<GameData> gamesList = (List<GameData>) currentGames;
+
+        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+
+        return String.format("Now observing game %s.", gamesList.get(gameIndex).gameName());
+
     }
 
     public String help() {
