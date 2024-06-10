@@ -67,4 +67,20 @@ public class ServerFacadeTests {
         assertThrows(DataAccessException.class, () -> serverFacade.login("username", "wrongPassword"));
     }
 
+    @Test
+    @DisplayName("test logout user success")
+    public void testLogoutUserSuccess() {
+        assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        LoginResponse response = assertDoesNotThrow(() -> serverFacade.login("username", "password"));
+        assertDoesNotThrow(() -> serverFacade.logout(response.authToken()));
+        assertThrows(DataAccessException.class, () -> serverFacade.logout(response.authToken()));
+    }
+
+    @Test
+    @DisplayName("test logout user bad auth token")
+    public void testLogoutUserBadAuthToken() {
+        assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertDoesNotThrow(() -> serverFacade.login("username", "password"));
+        assertThrows(DataAccessException.class, () -> serverFacade.logout(null));
+    }
 }
