@@ -1,8 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import dataaccess.AlreadyTakenException;
-import dataaccess.DataAccessException;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import response.CreateGameResponse;
@@ -12,6 +10,7 @@ import response.RegisterResponse;
 import server.Server;
 import ui.ServerFacade;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +30,13 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
 
         serverFacade = new ServerFacade("http://localhost:8080");
+    }
+
+    @BeforeEach
+    public void clearDatabase() {
         try {
             serverFacade.clearDatabase();
-        } catch (DataAccessException e) {
+        } catch (IOException e) {
             System.out.println("Something went wrong: " + e.getMessage());
         }
     }
@@ -56,7 +59,7 @@ public class ServerFacadeTests {
     @DisplayName("test register username taken")
     public void testRegisterUsernameTaken() {
         RegisterResponse response = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
-        assertThrows(DataAccessException.class, () -> serverFacade.register("username", "duplicate", "anotheremail@email.com"));
+        assertThrows(IOException.class, () -> serverFacade.register("username", "duplicate", "anotheremail@email.com"));
     }
 
     @Test
@@ -72,7 +75,7 @@ public class ServerFacadeTests {
     @DisplayName("test login user wrong password")
     public void testLoginUserWrongPassword() {
         assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
-        assertThrows(DataAccessException.class, () -> serverFacade.login("username", "wrongPassword"));
+        assertThrows(IOException.class, () -> serverFacade.login("username", "wrongPassword"));
     }
 
     @Test
@@ -81,7 +84,7 @@ public class ServerFacadeTests {
         assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         LoginResponse response = assertDoesNotThrow(() -> serverFacade.login("username", "password"));
         assertDoesNotThrow(() -> serverFacade.logout(response.authToken()));
-        assertThrows(DataAccessException.class, () -> serverFacade.logout(response.authToken()));
+        assertThrows(IOException.class, () -> serverFacade.logout(response.authToken()));
     }
 
     @Test
@@ -89,7 +92,7 @@ public class ServerFacadeTests {
     public void testLogoutUserBadAuthToken() {
         assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertDoesNotThrow(() -> serverFacade.login("username", "password"));
-        assertThrows(DataAccessException.class, () -> serverFacade.logout(null));
+        assertThrows(IOException.class, () -> serverFacade.logout(null));
     }
 
     @Test
@@ -104,7 +107,7 @@ public class ServerFacadeTests {
     @DisplayName("test create game bad input")
     public void testCreateGameBadInput() {
         RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
-        assertThrows(DataAccessException.class, () -> serverFacade.createGame(null, registerResponse.authToken()));
+        assertThrows(IOException.class, () -> serverFacade.createGame(null, registerResponse.authToken()));
     }
 
     @Test
@@ -133,7 +136,7 @@ public class ServerFacadeTests {
         RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
 
-        assertThrows(DataAccessException.class, () -> serverFacade.listGames(null));
+        assertThrows(IOException.class, () -> serverFacade.listGames(null));
     }
 
     @Test
@@ -157,6 +160,6 @@ public class ServerFacadeTests {
         RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
 
-        assertThrows(DataAccessException.class, () -> serverFacade.joinGame(ChessGame.TeamColor.WHITE, 2, "username", registerResponse.authToken()));
+        assertThrows(IOException.class, () -> serverFacade.joinGame(ChessGame.TeamColor.WHITE, 2, "username", registerResponse.authToken()));
     }
 }

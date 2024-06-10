@@ -4,13 +4,12 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dataaccess.DataAccessException;
-import dataaccess.SQLGameDAO;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import response.*;
+import serialization.ChessBoardDeserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ServerFacade {
@@ -28,46 +28,46 @@ public class ServerFacade {
     public ServerFacade(String url) {
         serverUrl = url;
         gson = new GsonBuilder()
-                .registerTypeAdapter(ChessBoard.class, new SQLGameDAO.ChessBoardDeserializer())
+                .registerTypeAdapter(ChessBoard.class, new ChessBoardDeserializer())
                 .create();
     }
 
-    public LoginResponse login(String username, String password) throws DataAccessException {
+    public LoginResponse login(String username, String password) throws IOException {
         String path = "/session";
         return this.makeRequest("POST", path, new LoginRequest(username, password), LoginResponse.class, null);
     }
 
-    public RegisterResponse register(String username, String password, String email) throws DataAccessException {
+    public RegisterResponse register(String username, String password, String email) throws IOException{
         String path = "/user";
         return this.makeRequest("POST", path, new RegisterRequest(username, password, email), RegisterResponse.class, null);
     }
 
-    public LogoutResponse logout(String authToken) throws DataAccessException {
+    public LogoutResponse logout(String authToken) throws IOException {
         String path = "/session";
         return this.makeRequest("DELETE", path, null, LogoutResponse.class, authToken);
     }
 
-    public CreateGameResponse createGame(String gameName, String authToken) throws DataAccessException {
+    public CreateGameResponse createGame(String gameName, String authToken) throws IOException {
         String path = "/game";
         return this.makeRequest("POST", path, new CreateGameRequest(gameName, null), CreateGameResponse.class, authToken);
     }
 
-    public ListGamesResponse listGames(String authToken) throws DataAccessException {
+    public ListGamesResponse listGames(String authToken) throws IOException {
         String path = "/game";
         return this.makeRequest("GET", path, null, ListGamesResponse.class, authToken);
     }
 
-    public JoinGameResponse joinGame(ChessGame.TeamColor teamColor, int gameId, String username, String authToken) throws DataAccessException {
+    public JoinGameResponse joinGame(ChessGame.TeamColor teamColor, int gameId, String username, String authToken) throws IOException {
         String path = "/game";
         return this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
     }
 
-    public void clearDatabase() throws DataAccessException {
+    public void clearDatabase() throws IOException {
         String path = "/db";
         this.makeRequest("DELETE", path, null, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws IOException {
         HttpURLConnection http = null;
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -86,8 +86,8 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
 
             return readBody(http, responseClass);
-        } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
+        } catch (IOException | URISyntaxException ex) {
+            throw new IOException(ex.getMessage());
         } finally {
             if (http != null) {
                 http.disconnect();
@@ -106,10 +106,10 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException{
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            throw new DataAccessException("failure: " + status);
+            throw new IOException("failure: " + status);
         }
     }
 

@@ -1,13 +1,12 @@
 package ui;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
 import model.GameData;
-import response.JoinGameResponse;
 import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -41,14 +40,14 @@ public class ChessClient {
                 case "quit" -> "quit";
                 default -> help();
             };
-        } catch (DataAccessException ex) {
+        } catch (IOException ex) {
             return ex.getMessage();
         }
     }
 
-    public String login(String [] params) throws DataAccessException {
+    public String login(String [] params) throws IOException {
         if (params.length < 2) {
-            throw new DataAccessException("username or password is missing.");
+            throw new IOException("username or password is missing.");
         }
         String username = params[0];
         String password = params[1];
@@ -62,9 +61,9 @@ public class ChessClient {
         return String.format("You signed in as %s.", playerName);
     }
 
-    public String register(String [] params) throws DataAccessException {
+    public String register(String [] params) throws IOException {
         if (params.length < 3) {
-            throw new DataAccessException("One or more fields are missing.");
+            throw new IOException("One or more fields are missing.");
         }
 
         String username = params[0];
@@ -80,7 +79,7 @@ public class ChessClient {
         return String.format("Registered and signed in as %s.", playerName);
     }
 
-    public String logout() throws DataAccessException {
+    public String logout() throws IOException {
         server.logout(authToken);
 
         state = State.SIGNEDOUT;
@@ -89,9 +88,9 @@ public class ChessClient {
         return "You have been signed out.";
     }
 
-    public String createGame(String[] params) throws DataAccessException {
+    public String createGame(String[] params) throws IOException {
         if (params.length < 1) {
-            throw new DataAccessException("Please enter a name for the game.");
+            throw new IOException("Please enter a name for the game.");
         }
 
         String gameName = params[0];
@@ -101,7 +100,7 @@ public class ChessClient {
         return "Created game successfully.";
     }
 
-    public String listGames() throws DataAccessException {
+    public String listGames() throws IOException{
         ListGamesResponse response = server.listGames(authToken);
 
         currentGames = response.games();
@@ -115,18 +114,18 @@ public class ChessClient {
         return "End of games list.";
     }
 
-    public String joinGame(String[] params) throws DataAccessException {
+    public String joinGame(String[] params) throws IOException {
         if (params.length < 2) {
-            throw new DataAccessException("Please the number of the game you want to join and the color you want to play as.");
+            throw new IOException("Please the number of the game you want to join and the color you want to play as.");
         }
         if (currentGames == null) {
-            throw new DataAccessException("Please be sure to view the list of available games first!");
+            throw new IOException("Please be sure to view the list of available games first!");
         }
 
         int gameIndex = Integer.parseInt(params[0]) - 1;
 
         if (gameIndex < 0 || gameIndex >= currentGames.size()) {
-            throw new DataAccessException("This game does not exist.");
+            throw new IOException("This game does not exist.");
         }
 
         String playerColorString = params[1];
@@ -147,18 +146,18 @@ public class ChessClient {
         return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
     }
 
-    public String observeGame(String[] params) throws DataAccessException {
+    public String observeGame(String[] params) throws IOException {
         if (params.length < 1) {
-            throw new DataAccessException("Please the number of the game you want to join.");
+            throw new IOException("Please the number of the game you want to join.");
         }
         if (currentGames == null) {
-            throw new DataAccessException("Please be sure to view the list of available games first!");
+            throw new IOException("Please be sure to view the list of available games first!");
         }
 
         int gameIndex = Integer.parseInt(params[0]) - 1;
 
         if (gameIndex < 0 || gameIndex >= currentGames.size()) {
-            throw new DataAccessException("This game does not exist.");
+            throw new IOException("This game does not exist.");
         }
 
         List<GameData> gamesList = (List<GameData>) currentGames;
