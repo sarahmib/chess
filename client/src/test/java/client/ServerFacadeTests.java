@@ -3,6 +3,7 @@ package client;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
+import response.LoginResponse;
 import response.RegisterResponse;
 import server.Server;
 import ui.ServerFacade;
@@ -48,6 +49,22 @@ public class ServerFacadeTests {
     public void testRegisterUsernameTaken() {
         RegisterResponse response = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertThrows(DataAccessException.class, () -> serverFacade.register("username", "duplicate", "anotheremail@email.com"));
+    }
+
+    @Test
+    @DisplayName("test login user success")
+    public void testLoginUserSuccess() {
+        assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        LoginResponse response = assertDoesNotThrow(() -> serverFacade.login("username", "password"));
+        assertEquals("username", response.username());
+        assertEquals(36, response.authToken().length());
+    }
+
+    @Test
+    @DisplayName("test login user wrong password")
+    public void testLoginUserWrongPassword() {
+        assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertThrows(DataAccessException.class, () -> serverFacade.login("username", "wrongPassword"));
     }
 
 }
