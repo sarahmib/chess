@@ -45,9 +45,9 @@ public class ServerFacade {
         return this.makeRequest("DELETE", path, null, LogoutResponse.class, authToken);
     }
 
-    public CreateGameResponse createGame(String gameId, String authToken) throws DataAccessException {
+    public CreateGameResponse createGame(String gameName, String authToken) throws DataAccessException {
         String path = "/game";
-        return this.makeRequest("POST", path, new CreateGameRequest(gameId, null), CreateGameResponse.class, authToken);
+        return this.makeRequest("POST", path, new CreateGameRequest(gameName, null), CreateGameResponse.class, authToken);
     }
 
     public ListGamesResponse listGames(String authToken) throws DataAccessException {

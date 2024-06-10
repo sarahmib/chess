@@ -3,6 +3,7 @@ package client;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.*;
+import response.CreateGameResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import server.Server;
@@ -82,5 +83,20 @@ public class ServerFacadeTests {
         assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
         assertDoesNotThrow(() -> serverFacade.login("username", "password"));
         assertThrows(DataAccessException.class, () -> serverFacade.logout(null));
+    }
+
+    @Test
+    @DisplayName("test create game success")
+    public void testCreateGameSuccess() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        CreateGameResponse createGameResponse = assertDoesNotThrow(() -> serverFacade.createGame("newGame", registerResponse.authToken()));
+        assertEquals(1, createGameResponse.gameID());
+    }
+
+    @Test
+    @DisplayName("test create game bad input")
+    public void testCreateGameBadInput() {
+        RegisterResponse registerResponse = assertDoesNotThrow(() -> serverFacade.register("username", "password", "email@email.com"));
+        assertThrows(DataAccessException.class, () -> serverFacade.createGame(null, registerResponse.authToken()));
     }
 }
