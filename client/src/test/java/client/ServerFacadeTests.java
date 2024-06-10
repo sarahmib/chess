@@ -135,4 +135,7 @@ public class ServerFacadeTests {
 
         assertThrows(DataAccessException.class, () -> serverFacade.listGames(null));
     }
+
+    // join game
+    // observe game
 }

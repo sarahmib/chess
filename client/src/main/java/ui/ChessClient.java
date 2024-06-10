@@ -2,7 +2,6 @@ package ui;
 
 import dataaccess.DataAccessException;
 import model.GameData;
-import response.CreateGameResponse;
 import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
@@ -33,6 +32,8 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
+                // join game
+                // observe game
                 case "quit" -> "quit";
                 default -> help();
             };
