@@ -62,7 +62,7 @@ public class SQLGameDAO implements GameDAO {
         return new GameData(resultID, resultWhiteUsername, resultBlackUsername, resultGameName, resultChessGame);
     }
 
-    public class ChessBoardDeserializer implements JsonDeserializer<ChessBoard> {
+    public static class ChessBoardDeserializer implements JsonDeserializer<ChessBoard> {
 
         @Override
         public ChessBoard deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
