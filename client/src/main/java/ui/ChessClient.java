@@ -3,7 +3,6 @@ package ui;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.GameData;
-import response.JoinGameResponse;
 import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
