@@ -9,13 +9,13 @@ import dataaccess.SQLGameDAO;
 import dataaccess.SQLUserDAO;
 import request.*;
 import response.*;
+import serialization.GsonConfigurator;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import static dataaccess.SQLExecution.configureDatabase;
 
@@ -33,11 +33,7 @@ public class Handler {
         userService = new UserService(new SQLUserDAO(), authService);
         gameService = new GameService(new SQLGameDAO(), authService);
 
-
-        GsonBuilder builder = new GsonBuilder();
-        builder.setPrettyPrinting();
-
-        gson = builder.create();
+        gson = GsonConfigurator.makeSerializerDeserializer();
     }
 
     public Object register(Request req, Response res) throws DataAccessException {

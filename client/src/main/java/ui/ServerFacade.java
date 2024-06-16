@@ -1,15 +1,13 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
 import response.*;
-import serialization.ChessBoardDeserializer;
+import serialization.GsonConfigurator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +25,7 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
-        gson = new GsonBuilder()
-                .registerTypeAdapter(ChessBoard.class, new ChessBoardDeserializer())
-                .create();
+        gson = GsonConfigurator.makeSerializerDeserializer();
     }
 
     public LoginResponse login(String username, String password) throws IOException {

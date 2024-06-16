@@ -1,10 +1,9 @@
 package dataaccess;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.*;
 import model.GameData;
-import serialization.ChessBoardDeserializer;
+import serialization.GsonConfigurator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,9 +19,7 @@ public class SQLGameDAO implements GameDAO {
     private final Gson gson;
     public SQLGameDAO() throws DataAccessException {
         configureTable(createGameStatements);
-        gson = new GsonBuilder()
-                .registerTypeAdapter(ChessBoard.class, new ChessBoardDeserializer())
-                .create();
+        gson = GsonConfigurator.makeSerializerDeserializer();
     }
 
     @Override
