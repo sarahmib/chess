@@ -7,8 +7,6 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import serialization.GsonConfigurator;
 import websocket.commands.*;
 import websocket.commands.UserGameCommand;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -52,12 +50,10 @@ public class WebSocketHandler {
 
     }
 
-    private void connect(Session session, String username, Connect command) throws IOException {
-        connections.add(command.getGameID(), username, session);
-        String message = String.format("%s just joined the game.", username);
-        NotificationMessage notification = new NotificationMessage(message);
-        connections.broadcast(command.getGameID(), username, notification);
-    }
+
+
+
+    private void connect(Session session, String username, Connect command) {}
 
     private void leaveGame(Session session, String username, Leave command) {}
 

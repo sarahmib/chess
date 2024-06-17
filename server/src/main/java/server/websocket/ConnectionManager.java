@@ -12,38 +12,29 @@ public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Set<Connection>> connections = new ConcurrentHashMap<>();
 
     public void add(Integer gameID, String playerName, Session session) {
-        Connection connection = new Connection(playerName, session);
-        Set<Connection> tempConnections = connections.get(gameID);
-        tempConnections.add(connection);
-        connections.put(gameID, tempConnections);
+//        var connection = new Connection(playerName, session);
+//        connections.put(gameID, connection);
     }
 
     public void remove(Integer gameID, String playerName) {
-        Set<Connection> tempConnections = connections.get(gameID);
-        for (Connection c : tempConnections) {
-            if (c.playerName == playerName) {
-                tempConnections.remove(c);
-                connections.put(gameID, tempConnections);
-                break;
-            }
-        }
+        // connections.remove(playerName);
     }
 
-    public void broadcast(Integer gameID, String excludeUsername, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        Set<Connection> connectionList = connections.get(gameID);
-        for (var connection : connectionList) {
-            if (connection.session.isOpen()) {
-                if (!connection.playerName.equals(excludeUsername)) {
-                    connection.send(notification.toString());
-                }
-            } else {
-                removeList.add(connection);
-            }
-        }
-
-        for (var c : removeList) {
-            remove(gameID, c.playerName);
-        }
+    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
+//        var removeList = new ArrayList<Connection>();
+//        for (var c : connections.values()) {
+//            if (c.session.isOpen()) {
+//                if (!c.visitorName.equals(excludeVisitorName)) {
+//                    c.send(notification.toString());
+//                }
+//            } else {
+//                removeList.add(c);
+//            }
+//        }
+//
+//        // Clean up any connections that were left open.
+//        for (var c : removeList) {
+//            // connections.remove(c.visitorName);
+//        }
     }
 }
