@@ -20,26 +20,31 @@ public class OutputChessboard {
     private static final String QUEEN = "Q";
     private static final String KING = "K";
 
-    public static void main(Object[][] board) {
+    public static void main(Object[][] board, ChessGame.TeamColor teamColor) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
-        drawHeadersAndFooters(out, ChessGame.TeamColor.WHITE);
+        if (teamColor == ChessGame.TeamColor.WHITE) {
 
-        drawChessBoard(out, board, ChessGame.TeamColor.WHITE);
+            drawHeadersAndFooters(out, teamColor);
 
-        drawHeadersAndFooters(out, ChessGame.TeamColor.WHITE);
+            drawChessBoard(out, board, teamColor);
+
+            drawHeadersAndFooters(out, teamColor);
+
+
+        } else {
+
+            drawHeadersAndFooters(out, teamColor);
+
+            drawChessBoard(out, board, teamColor);
+
+            drawHeadersAndFooters(out, teamColor);
+        }
 
         setBackground(out);
         out.println();
-        out.println();
-
-        drawHeadersAndFooters(out, ChessGame.TeamColor.BLACK);
-
-        drawChessBoard(out, board, ChessGame.TeamColor.BLACK);
-        drawHeadersAndFooters(out, ChessGame.TeamColor.BLACK);
-
         out.print(RESET_BG_COLOR);
         out.print(SET_TEXT_COLOR_WHITE);
     }

@@ -40,7 +40,7 @@ public class ChessClient implements ServerMessageObserver {
                 displayError(((ErrorMessage) message).getErrorMessage());
                 break;
             case LOAD_GAME:
-                loadGame(((LoadGameMessage) message).getGame());
+//                loadGame(((LoadGameMessage) message).getGame());
                 break;
         }
     }
@@ -53,9 +53,9 @@ public class ChessClient implements ServerMessageObserver {
         System.out.println("Error: " + errorMessage);
     }
 
-    private void loadGame(ChessGame game) {
-        OutputChessboard.main(game.getBoard().board);
-    }
+//    private void loadGame(ChessGame game) {
+//        OutputChessboard.main(game.getBoard().board);
+//    }
 
     public String eval(String input) {
         try {
@@ -174,7 +174,7 @@ public class ChessClient implements ServerMessageObserver {
         List<GameData> gamesList = (List<GameData>) currentGames;
         server.joinGame(playerColor, gamesList.get(gameIndex).gameID(), playerName, authToken);
 
-        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board, playerColor);
 
         inGame = true;
 
@@ -197,7 +197,7 @@ public class ChessClient implements ServerMessageObserver {
 
         List<GameData> gamesList = (List<GameData>) currentGames;
 
-        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board, ChessGame.TeamColor.WHITE);
 
         return String.format("Now observing game %s.", gamesList.get(gameIndex).gameName());
 

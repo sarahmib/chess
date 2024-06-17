@@ -1,6 +1,7 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -11,11 +12,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Set<Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(Integer gameID, String playerName, Session session) {
+    public void add(Integer gameID, String playerName, Session session) throws IOException {
         Connection connection = new Connection(playerName, session);
         Set<Connection> tempConnections = connections.get(gameID);
-        tempConnections.add(connection);
-        connections.put(gameID, tempConnections);
+        if (tempConnections == null) {
+            ErrorMessage message = new ErrorMessage("Error: game ID does not exist");
+            session.getRemote().sendString(message.toString());
+        } else {
+            tempConnections.add(connection);
+            connections.put(gameID, tempConnections);
+        }
     }
 
     public void remove(Integer gameID, String playerName) {
