@@ -20,7 +20,7 @@ public class ServerMessageAdapter extends TypeAdapter<ServerMessage> {
     @Override
     public ServerMessage read(JsonReader in) throws IOException {
         JsonObject jsonObject = JsonParser.parseReader(in).getAsJsonObject();
-        String type = jsonObject.get("type").getAsString();
+        String type = jsonObject.get("serverMessageType").getAsString();
 
         switch (type) {
             case "NOTIFICATION":

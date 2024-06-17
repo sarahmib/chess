@@ -1,32 +1,38 @@
-//package server.websocket;
-//
-//import com.google.gson.Gson;
-//import dataaccess.DataAccess;
-//import exception.ResponseException;
-//import org.eclipse.jetty.websocket.api.Session;
-//import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-//import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-//import webSocketMessages.Action;
-//import webSocketMessages.Notification;
-//
-//import java.io.IOException;
-//import java.util.Timer;
-//
-//
-//@WebSocket
-//public class WebSocketHandler {
-//
-//    private final ConnectionManager connections = new ConnectionManager();
-//
-//    @OnWebSocketMessage
-//    public void onMessage(Session session, String message) throws IOException {
-//        Action action = new Gson().fromJson(message, Action.class);
-//        switch (action.type()) {
-//            case ENTER -> enter(action.visitorName(), session);
-//            case EXIT -> exit(action.visitorName());
-//        }
-//    }
-//
+package server.websocket;
+
+import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.commands.UserGameCommand;
+
+import java.io.IOException;
+
+
+@WebSocket
+public class WebSocketHandler {
+
+    private final ConnectionManager connections = new ConnectionManager();
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws IOException {
+        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        switch (command.getCommandType()) {
+            case CONNECT -> connect();
+            case LEAVE -> leave();
+            case RESIGN -> resign();
+            case MAKE_MOVE -> makeMove();
+        }
+    }
+
+    private void connect() {}
+
+    private void leave() {}
+
+    private void resign() {}
+
+    private void makeMove() {}
+
 //    private void enter(String visitorName, Session session) throws IOException {
 //        connections.add(visitorName, session);
 //        var message = String.format("%s is in the shop", visitorName);
@@ -50,4 +56,4 @@
 //            throw new ResponseException(500, ex.getMessage());
 //        }
 //    }
-//}
+}
