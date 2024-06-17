@@ -65,9 +65,7 @@ public class ServerFacade {
 
     public JoinGameResponse joinGame(ChessGame.TeamColor teamColor, int gameId, String username, String authToken) throws IOException {
         String path = "/game";
-        JoinGameResponse response = this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
-        webSocketCommunicator.joinGame(authToken, gameId);
-        return response;
+        return this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
     }
 
     public void clearDatabase() throws IOException {

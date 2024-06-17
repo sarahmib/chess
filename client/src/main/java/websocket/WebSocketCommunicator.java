@@ -1,8 +1,6 @@
 package websocket;
 
 import com.google.gson.Gson;
-import serialization.GsonConfigurator;
-import websocket.commands.*;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -15,7 +13,6 @@ public class WebSocketCommunicator extends Endpoint {
 
     Session session;
     ServerMessageObserver serverMessageObserver;
-    Gson gson = GsonConfigurator.makeSerializerDeserializer();
 
 
     public WebSocketCommunicator(String url, ServerMessageObserver serverMessageObserver) throws IOException {
@@ -29,7 +26,7 @@ public class WebSocketCommunicator extends Endpoint {
 
             //set message handler
             this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);    // ADD TO GSON TO PARSE TO DIFFERENT TYPES OF SM
                 serverMessageObserver.notify(serverMessage);
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -42,14 +39,6 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String authToken, Integer gameID) throws IOException {
-        try {
-            Connect command = new Connect(authToken, gameID);
-            this.session.getBasicRemote().sendText(gson.toJson(command));
-        } catch (IOException ex) {
-            throw new IOException(ex.getMessage());
-        }
-    }
 //    public void enterPetShop(String visitorName) throws ResponseException {
 //        try {
 //            var action = new Action(Action.Type.ENTER, visitorName);
