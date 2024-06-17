@@ -23,13 +23,13 @@ public class UserCommandAdapter extends TypeAdapter<UserGameCommand> {
 
         switch (type) {
             case "CONNECT":
-                return gson.fromJson(jsonObject, Connect.class);
+                return gson.fromJson(jsonObject, ConnectCommand.class);
             case "LEAVE":
-                return gson.fromJson(jsonObject, Leave.class);
+                return gson.fromJson(jsonObject, LeaveCommand.class);
             case "MAKE_MOVE":
-                return gson.fromJson(jsonObject, MakeMove.class);
+                return gson.fromJson(jsonObject, MakeMoveCommand.class);
             case "RESIGN":
-                return gson.fromJson(jsonObject, Resign.class);
+                return gson.fromJson(jsonObject, ResignCommand.class);
             default:
                 throw new JsonParseException("Unknown element type: " + type);
         }

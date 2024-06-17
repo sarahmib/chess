@@ -1,6 +1,8 @@
 package websocket;
 
 import com.google.gson.Gson;
+import serialization.GsonConfigurator;
+import websocket.commands.ConnectCommand;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -13,6 +15,7 @@ public class WebSocketCommunicator extends Endpoint {
 
     Session session;
     ServerMessageObserver serverMessageObserver;
+    Gson gson = GsonConfigurator.makeSerializerDeserializer();
 
 
     public WebSocketCommunicator(String url, ServerMessageObserver serverMessageObserver) throws IOException {
@@ -39,6 +42,16 @@ public class WebSocketCommunicator extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
+    public void joinGame(String authToken, Integer gameID) throws IOException {
+        try {
+            ConnectCommand connect = new ConnectCommand(authToken, gameID);
+            this.session.getBasicRemote().sendText(gson.toJson(connect));
+        } catch (IOException ex) {
+            throw new IOException(ex.getMessage());
+        }
+    }
+}
+
 //    public void enterPetShop(String visitorName) throws ResponseException {
 //        try {
 //            var action = new Action(Action.Type.ENTER, visitorName);
@@ -57,5 +70,3 @@ public class WebSocketCommunicator extends Endpoint {
 //            throw new ResponseException(500, ex.getMessage());
 //        }
 //    }
-
-}

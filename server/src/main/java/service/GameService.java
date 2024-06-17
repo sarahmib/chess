@@ -25,6 +25,14 @@ public class GameService {
         this.authService = authService;
     }
 
+    public ChessGame getGame(Integer gameID) throws DataAccessException {
+        GameData gameData = gameDataAccess.getGame(gameID);
+        if (gameData == null) {
+            return null;
+        }
+        return gameData.game();
+    }
+
     public void clearGames() throws DataAccessException {
         gameDataAccess.clearGames();
     }
@@ -63,9 +71,11 @@ public class GameService {
 
         if (request.playerColor() == ChessGame.TeamColor.WHITE) {
             GameData newGame = new GameData(game.gameID(), request.username(), game.blackUsername(), game.gameName(), game.game());
+            game.game().setWhiteUsername(request.username());
             gameDataAccess.updateGame(newGame);
         } else {
             GameData newGame = new GameData(game.gameID(), game.whiteUsername(), request.username(), game.gameName(), game.game());
+            game.game().setBlackUsername(request.username());
             gameDataAccess.updateGame(newGame);
         }
 

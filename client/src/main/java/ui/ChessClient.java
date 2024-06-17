@@ -24,6 +24,7 @@ public class ChessClient implements ServerMessageObserver {
     private Collection<GameData> currentGames;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private boolean inGame = false;
 
     public ChessClient(String serverUrl) throws IOException {
         server = new ServerFacade(serverUrl, this);
@@ -53,7 +54,11 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private void loadGame(ChessGame game) {
-        OutputChessboard.main(game.getBoard().board);
+        if (playerName == game.getBlackUsername()) {
+            OutputChessboard.main(game.getBoard().board, ChessGame.TeamColor.BLACK);
+        } else {
+            OutputChessboard.main(game.getBoard().board, ChessGame.TeamColor.WHITE);
+        }
     }
 
     public String eval(String input) {
@@ -172,8 +177,7 @@ public class ChessClient implements ServerMessageObserver {
 
         List<GameData> gamesList = (List<GameData>) currentGames;
         server.joinGame(playerColor, gamesList.get(gameIndex).gameID(), playerName, authToken);
-
-        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+        inGame = true;
 
         return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
     }
@@ -194,7 +198,7 @@ public class ChessClient implements ServerMessageObserver {
 
         List<GameData> gamesList = (List<GameData>) currentGames;
 
-        OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
+        server.observeGame(authToken, gamesList.get(gameIndex).gameID());
 
         return String.format("Now observing game %s.", gamesList.get(gameIndex).gameName());
 
@@ -208,14 +212,23 @@ public class ChessClient implements ServerMessageObserver {
                     - quit
                     - help
                     """;
+        } else if (inGame) {
+            return """
+                    - movePiece <starting position> <ending position> (ex. format: B2 B3)
+                    - leaveGame
+                    - resignGame
+                    - displayMoves <piece position> (ex. format: B2)
+                    - redrawBoard
+                    """;
+        } else {
+            return """
+                    - createGame <game name>
+                    - joinGame <game number> <desired color (black/white)>
+                    - observeGame <game number>
+                    - listGames
+                    - logout
+                    - quit
+                    """;
         }
-        return """
-                - createGame <game name>
-                - joinGame <game number> <desired color (black/white)>
-                - observeGame <game number>
-                - listGames
-                - logout
-                - quit
-                """;
     }
 }

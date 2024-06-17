@@ -7,24 +7,37 @@ import dataaccess.UnauthorizedException;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
 import dataaccess.SQLUserDAO;
+import model.AuthData;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import request.*;
 import response.*;
 import serialization.GsonConfigurator;
+import server.websocket.ConnectionManager;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
+import websocket.commands.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+
+import java.io.IOException;
 
 import static dataaccess.SQLExecution.configureDatabase;
 
+@WebSocket
 public class Handler {
 
     private final UserService userService;
     private final GameService gameService;
     private final AuthService authService;
-    private final Gson gson;
+    private final Gson gson = GsonConfigurator.makeSerializerDeserializer();
+    private final ConnectionManager connections = new ConnectionManager();
 
     public Handler() throws DataAccessException {
         configureDatabase();
@@ -33,8 +46,71 @@ public class Handler {
         userService = new UserService(new SQLUserDAO(), authService);
         gameService = new GameService(new SQLGameDAO(), authService);
 
-        gson = GsonConfigurator.makeSerializerDeserializer();
     }
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws IOException {
+        try {
+            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+
+            String username = getUsername(command.getAuthString());
+
+            saveSession(command.getGameID(), session);
+
+            switch (command.getCommandType()) {
+                case CONNECT -> connect(session, username, (ConnectCommand) command);
+                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
+                case LEAVE -> leaveGame(session, username, (LeaveCommand) command);
+                case RESIGN -> resign(session, username, (ResignCommand) command);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());        //SEND AN ACTUAL ERROR MESSAGE
+        }
+    }
+
+    private String getUsername(String authToken) throws DataAccessException {
+        AuthData data = authService.isAuthorized(authToken);
+        return data.username();
+    }
+
+//    private void enter(String visitorName, Session session) throws IOException {
+//        connections.add(visitorName, session);
+//        var message = String.format("%s is in the shop", visitorName);
+//        var notification = new Notification(Notification.Type.ARRIVAL, message);
+//        connections.broadcast(visitorName, notification);
+//    }
+
+    private Integer getGameID() {
+        return null;
+    }
+
+    private void saveSession(Integer gameID, Session session) {
+        connections.add(gameID, session);
+    }
+
+    private void connect(Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
+        LoadGameMessage loadGameMessage = new LoadGameMessage(gameService.getGame(command.getGameID()));
+
+        if (loadGameMessage.getGame() == null) {
+            ErrorMessage errorMessage = new ErrorMessage("This game ID does not exist.");
+            session.getRemote().sendString(gson.toJson(errorMessage));
+        } else if (authService.isAuthorized(command.getAuthString()) == null) {
+            ErrorMessage errorMessage = new ErrorMessage("You are not authorized.");
+            session.getRemote().sendString(gson.toJson(errorMessage));
+        } else {
+            NotificationMessage message = new NotificationMessage(String.format("%s has joined the game.", username));
+            connections.broadcast(command.getGameID(), session, message);
+
+            session.getRemote().sendString(gson.toJson(loadGameMessage));
+        }
+    }
+
+    private void leaveGame(Session session, String username, LeaveCommand command) {}
+
+    private void resign(Session session, String username, ResignCommand command) {}
+
+    private void makeMove(Session session, String username, MakeMoveCommand command) {}
+
 
     public Object register(Request req, Response res) throws DataAccessException {
         RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);

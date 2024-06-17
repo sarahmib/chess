@@ -14,6 +14,8 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board;
+    private String whiteUsername;
+    private String blackUsername;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -209,6 +211,22 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public String getWhiteUsername() {
+        return whiteUsername;
+    }
+
+    public String getBlackUsername() {
+        return blackUsername;
+    }
+
+    public void setWhiteUsername(String whiteUsername) {
+        this.whiteUsername = whiteUsername;
+    }
+
+    public void setBlackUsername(String blackUsername) {
+        this.blackUsername = blackUsername;
     }
 
     @Override
