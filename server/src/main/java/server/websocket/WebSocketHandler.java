@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import serialization.GsonConfigurator;
+import websocket.commands.*;
 import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
@@ -13,25 +15,51 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final Gson gson = GsonConfigurator.makeSerializerDeserializer();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        switch (command.getCommandType()) {
-            case CONNECT -> connect();
-            case LEAVE -> leave();
-            case RESIGN -> resign();
-            case MAKE_MOVE -> makeMove();
+        try {
+            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+
+            // Throws a custom UnauthorizedException. Yours may work differently.
+            String username = getUsername(command.getAuthString());
+
+//            saveSession(command.getGameID(), session);
+
+            switch (command.getCommandType()) {
+                case CONNECT -> connect(session, username, (Connect) command);
+                case MAKE_MOVE -> makeMove(session, username, (MakeMove) command);
+                case LEAVE -> leaveGame(session, username, (Leave) command);
+                case RESIGN -> resign(session, username, (Resign) command);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());        //SEND AN ACTUAL ERROR MESSAGE
         }
     }
 
-    private void connect() {}
+    private String getUsername(String authToken) {
+        return null;
+    }
 
-    private void leave() {}
+    private Integer getGameID() {
+        return null;
+    }
 
-    private void resign() {}
+    private void saveSession(Integer gameID, Session session) {
 
-    private void makeMove() {}
+    }
+
+
+
+
+    private void connect(Session session, String username, Connect command) {}
+
+    private void leaveGame(Session session, String username, Leave command) {}
+
+    private void resign(Session session, String username, Resign command) {}
+
+    private void makeMove(Session session, String username, MakeMove command) {}
 
 //    private void enter(String visitorName, Session session) throws IOException {
 //        connections.add(visitorName, session);
