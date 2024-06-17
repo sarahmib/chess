@@ -38,6 +38,11 @@ public class ServerFacade {
         }
     }
 
+    public ServerFacade(String url) {
+        serverUrl = url;
+        gson = GsonConfigurator.makeSerializerDeserializer();
+    }
+
     public LoginResponse login(String username, String password) throws IOException {
         String path = "/session";
         return this.makeRequest("POST", path, new LoginRequest(username, password), LoginResponse.class, null);
