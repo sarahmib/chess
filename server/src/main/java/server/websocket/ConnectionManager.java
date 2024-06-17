@@ -9,18 +9,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Integer, Set<Session>> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, Set<Connection>> connections = new ConcurrentHashMap<>();
 
-//    public void add(String visitorName, Session session) {
-//        var connection = new Connection(visitorName, session);
-//        connections.put(visitorName, connection);
-//    }
-//
-//    public void remove(String visitorName) {
-//        connections.remove(visitorName);
-//    }
-//
-//    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
+    public void add(Integer gameID, String playerName, Session session) {
+//        var connection = new Connection(playerName, session);
+//        connections.put(gameID, connection);
+    }
+
+    public void remove(Integer gameID, String playerName) {
+        // connections.remove(playerName);
+    }
+
+    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
 //        var removeList = new ArrayList<Connection>();
 //        for (var c : connections.values()) {
 //            if (c.session.isOpen()) {
@@ -34,7 +34,7 @@ public class ConnectionManager {
 //
 //        // Clean up any connections that were left open.
 //        for (var c : removeList) {
-//            connections.remove(c.visitorName);
+//            // connections.remove(c.visitorName);
 //        }
-//    }
+    }
 }
