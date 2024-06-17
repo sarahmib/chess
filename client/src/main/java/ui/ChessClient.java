@@ -24,6 +24,7 @@ public class ChessClient implements ServerMessageObserver {
     private Collection<GameData> currentGames;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private boolean inGame = false;
 
     public ChessClient(String serverUrl) throws IOException {
         server = new ServerFacade(serverUrl, this);
@@ -175,6 +176,8 @@ public class ChessClient implements ServerMessageObserver {
 
         OutputChessboard.main(gamesList.get(gameIndex).game().getBoard().board);
 
+        inGame = true;
+
         return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
     }
 
@@ -207,6 +210,14 @@ public class ChessClient implements ServerMessageObserver {
                     - register <username> <password> <email>
                     - quit
                     - help
+                    """;
+        } else if (inGame) {
+            return """
+                    - movePiece <starting position> <ending position> (ex. format: B2 B3)
+                    - leaveGame
+                    - resignGame
+                    - displayMoves <piece position> (ex. format: B2)
+                    - redrawBoard
                     """;
         }
         return """
