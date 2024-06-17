@@ -3,10 +3,15 @@ package ui;
 import java.util.Scanner;
 
 public class Repl {
-    private final ChessClient client;
+    private ChessClient client = null;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl);
+        try {
+            client = new ChessClient(serverUrl);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     public void run() {

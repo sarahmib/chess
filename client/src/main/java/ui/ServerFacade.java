@@ -8,6 +8,8 @@ import request.LoginRequest;
 import request.RegisterRequest;
 import response.*;
 import serialization.GsonConfigurator;
+import websocket.ServerMessageObserver;
+import websocket.WebSocketCommunicator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,10 +24,18 @@ public class ServerFacade {
 
     private final String serverUrl;
     private static Gson gson;
+    private WebSocketCommunicator webSocketCommunicator = null;
 
-    public ServerFacade(String url) {
+
+    public ServerFacade(String url, ServerMessageObserver serverMessageObserver) {
         serverUrl = url;
         gson = GsonConfigurator.makeSerializerDeserializer();
+        try{
+            webSocketCommunicator = new WebSocketCommunicator(url, serverMessageObserver);}
+        catch (IOException e){
+            System.err.println("Error creating websocket communicator: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     public LoginResponse login(String username, String password) throws IOException {

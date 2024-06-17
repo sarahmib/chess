@@ -5,6 +5,11 @@ import model.GameData;
 import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
+import websocket.ServerMessageObserver;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
 
     private String playerName = null;
     private String authToken = null;
@@ -20,8 +25,35 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
 
-    public ChessClient(String serverUrl) {
-        server = new ServerFacade(serverUrl);
+    public ChessClient(String serverUrl) throws IOException {
+        server = new ServerFacade(serverUrl, this);
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION:
+                displayNotification(((NotificationMessage) message).getMessage());
+                break;
+            case ERROR:
+                displayError(((ErrorMessage) message).getErrorMessage());
+                break;
+            case LOAD_GAME:
+                loadGame(((LoadGameMessage) message).getGame());
+                break;
+        }
+    }
+
+    private void displayNotification(String message) {
+        System.out.println("Server message: " + message);
+    }
+
+    private void displayError(String errorMessage) {
+        System.out.println("Error: " + errorMessage);
+    }
+
+    private void loadGame(ChessGame game) {
+        OutputChessboard.main(game.getBoard().board);
     }
 
     public String eval(String input) {
