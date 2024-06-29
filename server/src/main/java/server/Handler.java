@@ -214,7 +214,6 @@ public class Handler {
     private String toJson(Object response) {
         String resultAsJson;
         resultAsJson = gson.toJson(response);
-        System.out.println(resultAsJson);
         return resultAsJson;
     }
 

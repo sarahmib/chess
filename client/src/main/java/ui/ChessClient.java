@@ -6,16 +6,14 @@ import response.ListGamesResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import websocket.ServerMessageObserver;
+import websocket.WebSocketCommunicator;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ChessClient implements ServerMessageObserver {
 
@@ -23,11 +21,15 @@ public class ChessClient implements ServerMessageObserver {
     private String authToken = null;
     private Collection<GameData> currentGames;
     private final ServerFacade server;
+    private final WebSocketCommunicator wsCommunicator;
     private State state = State.SIGNEDOUT;
     private boolean inGame = false;
+    private Scanner scanner;
 
-    public ChessClient(String serverUrl) throws IOException {
-        server = new ServerFacade(serverUrl, this);
+    public ChessClient(String serverUrl, Scanner scanner) throws IOException {
+        server = new ServerFacade(serverUrl);
+        wsCommunicator = new WebSocketCommunicator(serverUrl, this);
+        this.scanner = scanner;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private void loadGame(ChessGame game) {
-        if (playerName == game.getBlackUsername()) {
+        if (Objects.equals(playerName, game.getBlackUsername())) {
             OutputChessboard.main(game.getBoard().board, ChessGame.TeamColor.BLACK);
         } else {
             OutputChessboard.main(game.getBoard().board, ChessGame.TeamColor.WHITE);
@@ -67,13 +69,13 @@ public class ChessClient implements ServerMessageObserver {
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login" -> login(params);
-                case "register" -> register(params);
+                case "login" -> login();
+                case "register" -> register();
                 case "logout" -> logout();
-                case "creategame" -> createGame(params);
+                case "creategame" -> createGame();
                 case "listgames" -> listGames();
-                case "joingame" -> joinGame(params);
-                case "observegame" -> observeGame(params);
+                case "joingame" -> joinGame();
+                case "observegame" -> observeGame();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -82,12 +84,12 @@ public class ChessClient implements ServerMessageObserver {
         }
     }
 
-    public String login(String [] params) throws IOException {
-        if (params.length < 2) {
-            throw new IOException("username or password is missing.");
-        }
-        String username = params[0];
-        String password = params[1];
+    public String login() throws IOException {
+        System.out.println("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.println("Password: ");
+        String password = scanner.nextLine();
 
         LoginResponse response = server.login(username, password);
 
@@ -98,14 +100,15 @@ public class ChessClient implements ServerMessageObserver {
         return String.format("You signed in as %s.", playerName);
     }
 
-    public String register(String [] params) throws IOException {
-        if (params.length < 3) {
-            throw new IOException("One or more fields are missing.");
-        }
+    public String register() throws IOException {
+        System.out.println("Username: ");
+        String username = scanner.nextLine();
 
-        String username = params[0];
-        String password = params[1];
-        String email = params[2];
+        System.out.println("Password: ");
+        String password = scanner.nextLine();
+
+        System.out.println("Email: ");
+        String email = scanner.nextLine();
 
         RegisterResponse response = server.register(username, password, email);
 
@@ -125,12 +128,9 @@ public class ChessClient implements ServerMessageObserver {
         return "You have been signed out.";
     }
 
-    public String createGame(String[] params) throws IOException {
-        if (params.length < 1) {
-            throw new IOException("Please enter a name for the game.");
-        }
-
-        String gameName = params[0];
+    public String createGame() throws IOException {
+        System.out.println("Enter a name for your game:");
+        String gameName = scanner.nextLine();
 
         server.createGame(gameName, authToken);
 
@@ -144,28 +144,32 @@ public class ChessClient implements ServerMessageObserver {
 
         int gameNum = 1;
         for (GameData data : response.games()) {
-            System.out.println(String.format("%d. Game name: %s\nWhite player: %s\nBlack player: %s\n", gameNum, data.gameName(), data.whiteUsername(), data.blackUsername()));
+            System.out.printf("%d. Game name: %s\nWhite player: %s\nBlack player: %s\n%n", gameNum, data.gameName(), data.whiteUsername(), data.blackUsername());
             gameNum++;
         }
 
         return "End of games list.";
     }
 
-    public String joinGame(String[] params) throws IOException {
-        if (params.length < 2) {
-            throw new IOException("Please the number of the game you want to join and the color you want to play as.");
-        }
-        if (currentGames == null) {
-            throw new IOException("Please be sure to view the list of available games first!");
-        }
+    private void listGamesNoPrinting() throws IOException{
+        ListGamesResponse response = server.listGames(authToken);
+        currentGames = response.games();
+    }
 
-        int gameIndex = Integer.parseInt(params[0]) - 1;
+    public String joinGame() throws IOException {
+        System.out.println("Enter the number of the game you want to join:");
+        int gameIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+        System.out.println("Enter the color you want to play as (black/white");
+        String playerColorString = scanner.nextLine();
+
+        if (currentGames == null) {
+            listGamesNoPrinting();
+        }
 
         if (gameIndex < 0 || gameIndex >= currentGames.size()) {
             throw new IOException("This game does not exist.");
         }
-
-        String playerColorString = params[1];
 
         ChessGame.TeamColor playerColor;
 
@@ -179,18 +183,19 @@ public class ChessClient implements ServerMessageObserver {
         server.joinGame(playerColor, gamesList.get(gameIndex).gameID(), playerName, authToken);
         inGame = true;
 
+        wsCommunicator.joinGame(authToken, gamesList.get(gameIndex).gameID());
+
         return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
     }
 
-    public String observeGame(String[] params) throws IOException {
-        if (params.length < 1) {
-            throw new IOException("Please the number of the game you want to join.");
-        }
-        if (currentGames == null) {
-            throw new IOException("Please be sure to view the list of available games first!");
-        }
+    public String observeGame() throws IOException {
 
-        int gameIndex = Integer.parseInt(params[0]) - 1;
+        System.out.println("Enter the number of the game you want to join:");
+        int gameIndex = Integer.parseInt(scanner.nextLine()) - 1;
+
+        if (currentGames == null) {
+            listGamesNoPrinting();
+        }
 
         if (gameIndex < 0 || gameIndex >= currentGames.size()) {
             throw new IOException("This game does not exist.");
@@ -198,7 +203,7 @@ public class ChessClient implements ServerMessageObserver {
 
         List<GameData> gamesList = (List<GameData>) currentGames;
 
-        server.observeGame(authToken, gamesList.get(gameIndex).gameID());
+        // server.observeGame(authToken, gamesList.get(gameIndex).gameID());
 
         return String.format("Now observing game %s.", gamesList.get(gameIndex).gameName());
 
@@ -207,8 +212,8 @@ public class ChessClient implements ServerMessageObserver {
     public String help() {
         if (state == State.SIGNEDOUT) {
             return """
-                    - login <username> <password>
-                    - register <username> <password> <email>
+                    - login
+                    - register
                     - quit
                     - help
                     """;
@@ -222,9 +227,9 @@ public class ChessClient implements ServerMessageObserver {
                     """;
         } else {
             return """
-                    - createGame <game name>
-                    - joinGame <game number> <desired color (black/white)>
-                    - observeGame <game number>
+                    - createGame
+                    - joinGame
+                    - observeGame
                     - listGames
                     - logout
                     - quit
