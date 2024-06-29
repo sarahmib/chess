@@ -94,6 +94,7 @@ public class Handler {
             NotificationMessage message = new NotificationMessage(String.format("%s has joined the game.", username));
             connections.broadcast(command.getGameID(), session, message);
 
+            System.out.println(gson.toJson(loadGameMessage));
             session.getRemote().sendString(gson.toJson(loadGameMessage));
         }
     }

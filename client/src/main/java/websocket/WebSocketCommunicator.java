@@ -29,7 +29,7 @@ public class WebSocketCommunicator extends Endpoint {
 
             //set message handler
             this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);    // ADD TO GSON TO PARSE TO DIFFERENT TYPES OF SM
+                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                 serverMessageObserver.notify(serverMessage);
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
