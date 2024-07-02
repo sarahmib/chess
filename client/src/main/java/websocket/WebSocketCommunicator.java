@@ -1,6 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import serialization.GsonConfigurator;
 import websocket.commands.ConnectCommand;
 import websocket.messages.ServerMessage;
@@ -27,10 +28,12 @@ public class WebSocketCommunicator extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            //set message handler
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-                serverMessageObserver.notify(serverMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                    serverMessageObserver.notify(serverMessage);
+                }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new IOException(ex.getMessage());

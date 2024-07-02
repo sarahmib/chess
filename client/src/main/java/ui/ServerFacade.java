@@ -24,19 +24,6 @@ public class ServerFacade {
 
     private final String serverUrl;
     private static Gson gson;
-//    private WebSocketCommunicator webSocketCommunicator = null;
-
-
-//    public ServerFacade(String url, ServerMessageObserver serverMessageObserver) {
-//        serverUrl = url;
-//        gson = GsonConfigurator.makeSerializerDeserializer();
-//        try{
-//            webSocketCommunicator = new WebSocketCommunicator(url, serverMessageObserver);}
-//        catch (IOException e){
-//            System.err.println("Error creating websocket communicator: " + e.getMessage());
-//            System.exit(1);
-//        }
-//    }
 
     public ServerFacade(String url) {
         serverUrl = url;
@@ -70,16 +57,8 @@ public class ServerFacade {
 
     public JoinGameResponse joinGame(ChessGame.TeamColor teamColor, int gameId, String username, String authToken) throws IOException {
         String path = "/game";
-        JoinGameResponse response =  this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
-//        webSocketCommunicator.joinGame(authToken, gameId);
-        return response;
+        return this.makeRequest("PUT", path, new JoinGameRequest(teamColor, gameId, username), JoinGameResponse.class, authToken);
     }
-
-//    public void observeGame(String authToken, int gameID) throws IOException {
-//        webSocketCommunicator.joinGame(authToken, gameID);
-//    }
-
-    // if this logic is supposed to be implemented from (doesn't pass tests if from client), how to properly do observe game and everything?
 
     public void clearDatabase() throws IOException {
         String path = "/db";
