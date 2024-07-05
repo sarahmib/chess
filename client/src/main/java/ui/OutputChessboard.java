@@ -5,7 +5,6 @@ import chess.ChessPiece;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 

@@ -9,8 +9,6 @@ import response.LoginResponse;
 import response.RegisterResponse;
 import server.Server;
 import ui.ServerFacade;
-import websocket.ServerMessageObserver;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;

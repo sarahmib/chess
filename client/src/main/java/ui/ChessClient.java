@@ -185,6 +185,8 @@ public class ChessClient implements ServerMessageObserver {
 
         wsCommunicator.joinGame(authToken, gamesList.get(gameIndex).gameID());
 
+        System.out.println();
+
         return String.format("Successfully joined game %s.", gamesList.get(gameIndex).gameName());
     }
 

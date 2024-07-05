@@ -48,4 +48,9 @@ public class AuthService {
         }
         return authData;
     }
+
+    public boolean isNotAuthorizedWs(String authToken) throws DataAccessException {
+        AuthData authData = authDataAccess.getAuth(authToken);
+        return authData == null;
+    }
 }

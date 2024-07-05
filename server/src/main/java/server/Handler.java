@@ -64,7 +64,8 @@ public class Handler {
                 case RESIGN -> resign(session, username, (ResignCommand) command);
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());        //SEND AN ACTUAL ERROR MESSAGE
+            ErrorMessage errorMessage = new ErrorMessage(ex.getMessage());
+            session.getRemote().sendString(gson.toJson(errorMessage));
         }
     }
 
@@ -83,18 +84,16 @@ public class Handler {
 
     private void connect(Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
         LoadGameMessage loadGameMessage = new LoadGameMessage(gameService.getGame(command.getGameID()));
-
         if (loadGameMessage.getGame() == null) {
             ErrorMessage errorMessage = new ErrorMessage("This game ID does not exist.");
             session.getRemote().sendString(gson.toJson(errorMessage));
-        } else if (authService.isAuthorized(command.getAuthString()) == null) {
+        } else if (authService.isNotAuthorizedWs(command.getAuthString())) {
             ErrorMessage errorMessage = new ErrorMessage("You are not authorized.");
             session.getRemote().sendString(gson.toJson(errorMessage));
         } else {
             NotificationMessage message = new NotificationMessage(String.format("%s has joined the game.", username));
             connections.broadcast(command.getGameID(), session, message);
 
-            System.out.println(gson.toJson(loadGameMessage));
             session.getRemote().sendString(gson.toJson(loadGameMessage));
         }
     }
